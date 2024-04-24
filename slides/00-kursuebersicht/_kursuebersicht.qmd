@@ -1,0 +1,243 @@
+---
+title: "Angewandte Datenverarbeitung und Visualisierung"
+subtitle: "Kursübersicht - SoSe2024"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 1 - R und RStudio"
+lang: de
+date: "04/16/2024"
+date-format: "ddd [den] DD.MM.YYYY"
+date-modified: last-modified
+format:
+  html:
+    output-file: kursuebersicht_blatt.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: kursuebersicht_folien.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    number-sections: true
+    number-depth: 1
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: kursuebersicht.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: references/references.bib
+csl: references/apa.csl
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_kursuebersicht.qmd")
+```
+
+# Moodle
+
+Moodle: "Angewandte Datenverarbeitung und Visualisierung: R für Linguistik und Sozialwissenschaften"
+
+Schlüssel: r4ling
+
+## Moodle: Allgemein
+
+- Forum
+  + Bitte stellen Sie alle Fragen/Probleme, die Sie haben, ins Forum, damit Ihre Kommilitonen von den Antworten profitieren können
+- R Cheatsheets (Spickzettel)
+  + normalerweise eine 1-seitige Zusammenfassung nützlicher Funktionen und Befehle, die für ein bestimmtes Paket oder eine bestimmte Aufgabe relevant sind
+- Ressourcen
+  + erforderliche und vorgeschlagene Materialien
+
+## Moodle: Ressourcen
+
+- Die Folien/Vortragsnotizen sind in drei Formate verfügbar:
+  + Folien (endend mit `_folien.html`)
+  + HTML (endend mit `_blatt.html`)
+  + PDF (endend mit `.pdf`)
+  
+## Moodle: Thematische Überschriften
+
+- erforderliche und vorgeschlagene Lektüre/Materialien sind unter jeder Woche aufgeführt
+- Unterrichtsmaterialien (z. B. meine Folien/Vortragsnotizen) werden kurz vor Beginn des Unterrichts zur Verfügung stehen
+  
+# Kurs-Website
+
+- Ich habe eine Kurs-Website erstellt: [daniela-palleschi.github.io/r4ling](daniela-palleschi.github.io/r4ling)
+- Diese ist ergänzend und dient dazu, den Unterricht über jedes Semester hinweg zu erleichtern
+- im Moment enthält sie dieselben Informationen wie die Folien, die ich jede Woche präsentiere
+
+# Kursübersicht
+
+-   Studienleistungen
+    -   3LP
+        -   1LP: wöchentlichen Hausaufgaben 
+            + 4 über Moodle einzureichen, 4 Wochen nach Wahl (je 0,5LP)
+        -   2LP: zwei "in-class" Berichte (je 1LP)
+
+- Sprechstunden: Dienstags, 11.00-12.00 (nach Vereinbarung)
+
+## Kursziele
+
+-   im Großen und Ganzen werden Sie lernen, wie man mit einem Datensatz arbeitet und ihn beschreibt
+-   es wird vorausgesetzt, dass Sie keine Erfahrung mit Programmierung oder Datenanalyse haben
+
+### Was werden Sie lernen?
+
+-   Programmieren
+-   Datenimport
+-   Daten bereinigen
+    -   Daten angemessen zu strukturieren
+-   Datenvisualisierung
+    -   Wie man verschiedene Arten von Daten darstellt
+-   Datenkommunikation
+    -   beschreiben
+
+### Was werden Sie *nicht* lernen?
+
+-   Wir werden nicht auf die Inferenzstatistik eingehen (d.h. Hypothesentests)
+-   Big Data
+-   andere Programmiersprachen wie Python, Julia
+    -   aber Sie können sie in RStudio verwenden
+    
+# Software
+
+- R: eine Programmiersprache, in der wir Code schreiben werden (grundlegende Software)
+- RStudio: ein Programm, das uns die Arbeit in R erleichtert (zusätzliche Entwicklungsumgebung)
+- LaTeX: ein Schriftsatzsystem, das Dokumente im PDF-Format erzeugt
+
+- warum R?
+  -  R und RStudio sind quelloffene und kostenlose Software
+  -  sie sind in Wissenschaft und Wirtschaft weit verbreitet
+
+::: {.content-hidden when-format="pdf"}
+::: {.column width="30%"}
+```{r eval = T, fig.env = "figure", out.width="50%", fig.align = "center"}
+#| echo: false
+
+magick::image_read(here::here("media/R_logo.png"))
+```
+:::
+
+::: {.column width="30%"}
+```{r eval = T, fig.env = "figure", out.width="75%", fig.align = "center"}
+#| echo: false
+
+magick::image_read(here::here("media/RStudio_logo.png"))
+```
+:::
+:::
+
+::: {.content-visible when-format="revealjs"}
+::: {.column width="30%"}
+```{r eval = T, fig.env = "figure", out.width="75%", fig.align = "center"}
+#| echo: false
+
+magick::image_negate(magick::image_read(here::here("media/LaTeX_logo.png")))
+```
+:::
+:::
+
+::: {.content-hidden when-format="pdf"}
+::: {.content-hidden when-format="revealjs"}
+::: {.column width="30%"}
+```{r eval = T, fig.env = "figure", out.width="75%", fig.align = "center"}
+#| echo: false
+
+magick::image_read(here::here("media/LaTeX_logo.png"))
+```
+:::
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r eval = T, fig.env = "figure", fig.pos="H", out.width="75%", fig.align = "center"}
+#| echo: false
+
+R <- grid::rasterGrob(as.raster(png::readPNG(here::here("media", "R_logo.png"))))
+
+RStudio <- grid::rasterGrob(as.raster(png::readPNG(here::here("media", "RStudio_logo.png"))))
+
+latex <- grid::rasterGrob(as.raster(png::readPNG(here::here("media", "LaTeX_logo2.png"))))
+
+gridExtra::grid.arrange(R, NULL, RStudio, NULL, latex, ncol=5,
+                        widths=c(.25,.125,.25,.125,.25))
+```
+:::
+
+## R installieren
+
+-   wir brauchen die kostenlose und quelloffene Statistiksoftware R, um unsere Daten zu analysieren
+-   herunterladen und installieren R: <https://www.r-project.org>
+
+## RStudio installieren
+
+-   wir brauchen RStudio, um einfacher mit R arbeiten zu können
+-   RStudio herunterladen und installieren: <https://rstudio.com>
+-   es kann hilfreich sein, Englisch als Sprache in RStudio beizubehalten
+    -   Wir werden mehr hilfreiche Informationen finden, wenn wir Fehlermeldungen auf Englisch im Internet suchen
+
+-   Wenn Sie Probleme bei der Installation von R oder RStudio haben, sehen Sie sich diese Hilfeseite an (auf Deutsch): <http://methods-berlin.com/wp-content/uploads/Installation.html>
+
+## LaTeX installieren
+
+- wir werden nicht direkt mit LaTeX arbeiten, aber es wird im Hintergrund benötigt
+- LaTeX herunterladen und installieren: <https://www.latex-project.org/get/>
+
+# Ressourcen
+
+-   viele Aspekte dieses Kurses sind inspiriert von @nordmann_applied_2022 und @wickham_r_2023
+    -   beide frei online verfügbar (in Englisch)
+-   für deutschsprachige Ressourcen besuchen Sie die Website der [Methodengruppe Berlin](http://methods-berlin.com/de/r-lernplattform/)
+
+## Fehlersuche (EN: Troubleshooting)
+
+-   Fehlermeldungen sind in der Programmierung sehr häufig, und zwar auf allen Niveaus.
+-   Wie man Lösungen für diese Fehlermeldungen findet, ist eine Kunst für sich
+-   Google ist Ihr Freund! Wenn möglich, googeln auf Englisch, um mehr Informationen zu erhalten
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
