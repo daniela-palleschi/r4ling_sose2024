@@ -1,0 +1,171 @@
+---
+title: "Standardabweichung berechnen"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    code-tools: true
+  pdf:
+    toc: true
+---
+
+Die Standardabweichung ($\sigma$) ist gleich der Quadratwurzel ($\sqrt{}$) der quadrierten ($^2$) Summe ($\sum$) der Differenz zwischen jedem Wert ($x_i$) und dem Mittelwert ($x_{1...n}-\mu$), geteilt durch die Anzahl der Werte minus 1 ($N-1$):
+
+\begin{align}
+\sigma = \sqrt{\frac{\sum(x_i - \mu)^2}{N-1}}
+\end{align}
+
+Versuchen wir, dies Schritt für Schritt zu tun:
+
+1. Werte als Objekt speichern
+1. Bestimme $N$
+2. berechne den Mittelwert ($\mu$)
+3. die Differenz zwischen jedem Wert und dem Mittelwert berechnen (Mittelwert von jedem Wert subtrahieren; $x_{1...n}-\mu$)
+4. diese Werte quadrieren ($^2$)
+5. Summe der quadrierten Werte ($\sum$)
+5. teile diesen Wert durch N-1
+6. Berechne die Quadratwurzel ($\sqrt{}$)
+
+# Werte als Objekt speichern
+
+```{r}
+werte <- c(13, 0, 2000, 5, 19)
+```
+
+Werte ausgeben
+
+```{r}
+werte
+```
+
+# Bestimme $N$
+
+#### Von Hand: Werte ausdrucken und zählen, wie viele es sind {.unnumbered}
+```{r}
+werte
+```
+
+#### Oder verwenden Sie die Funktion `length()` {.unnumbered}
+```{r}
+length(werte)
+```
+
+
+# Mittelwert berechnen
+
+Der Mittelwert ($\mu$) ist die Summe ($\sum$) der Werte ($x$) geteilt durch die Anzahl der Werte ($N$):
+
+$$
+\mu = \frac{\sum x}{N}
+$$
+
+#### Von Hand {.unnumbered}
+
+Tippen Sie alle Werte ab:
+
+```{r}
+(13 + 0 + 2000 + 5 + 19)/5
+```
+
+#### Oder mit Hilfe der Funktionen `sum()` und `length()` {.unnumbered}
+```{r}
+sum(werte)/length(werte)
+```
+
+#### Oder indem man einfach die Funktion `mean()` {.unnumbered}
+
+```{r}
+mean(werte)
+```
+
+# Mittelwert von jedem Wert subtrahieren
+
+Dies kann auch auf verschiedene Weise geschehen
+
+#### Von Hand (mühsam und anfällig für menschliche Fehler) {.unnumbered}
+```{r}
+(13 - 407.4)
+(0 - 407.4) 
+(2000 - 407.4)
+(5 - 407.4)
+(19 - 407.4)
+```
+
+#### Oder unter Verwendung des Objektnamens {.unnumbered}
+```{r}
+werte - mean(werte)
+```
+
+# Diese Werte quadrieren
+
+#### Von Hand {.unnumbered}
+```{r}
+(13 - 407.4)^2
+(0 - 407.4)^2
+(2000 - 407.4)^2
+(5 - 407.4)^2
+(19 - 407.4)^2
+```
+
+#### Oder durch Verwendung von `^2` mit dem Variablennamen {.unnumbered}
+```{r}
+(werte - mean(werte))^2
+```
+
+# Summe der quadrierten Werte
+
+#### Von Hand {.unnumbered}
+```{r}
+(13 - 407.4)^2 +
+(0 - 407.4)^2 +
+(2000 - 407.4)^2 +
+(5 - 407.4)^2 +
+(19 - 407.4)^2
+```
+
+#### Oder mit dem Objektnamen und einigen Funktionen {.unnumbered}
+```{r}
+sum((werte - mean(werte)) ^ 2)
+```
+
+# Dividieren durch N-1
+
+#### Von Hand {.unnumbered}
+
+```{r}
+((13 - 407.4) ^ 2 +
+   (0 - 407.4) ^ 2 +
+   (2000 - 407.4) ^ 2 +
+   (5 - 407.4) ^ 2 +
+   (19 - 407.4) ^ 2)/(5-1)
+```
+
+#### Oder mit dem Objektnamen und einigen Funktionen {.unnumbered}
+
+```{r}
+sum((werte - mean(werte)) ^ 2) / (length(werte) - 1)
+```
+
+# Berechne die Quadratwurzel
+
+#### Von Hand {.unnumbered}
+
+```{r}
+sqrt(((13 - 407.4)^2 +
+(0 - 407.4)^2 +
+(2000 - 407.4)^2 +
+(5 - 407.4)^2 +
+(19 - 407.4)^2)/(5-1))
+```
+
+#### Oder mit dem Objektnamen und einigen Funktionen {.unnumbered}
+
+```{r}
+sqrt(sum((werte - mean(werte)) ^ 2) / (length(werte) - 1))
+```
+
+# Prüfen mit `sd()` Funktion
+
+```{r}
+sd(werte)
+```

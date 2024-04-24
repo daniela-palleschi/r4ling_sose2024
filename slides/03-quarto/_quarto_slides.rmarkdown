@@ -1,0 +1,908 @@
+---
+title: "Einführung in Quarto"
+subtitle: "Dynamische und reproduzierbare Berichte mit R"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 3 - Quarto" 
+lang: de
+date: "01/11/2023"
+date-format: "ddd [d]en DD.MM.YYYY"
+date-modified: last-modified
+format: 
+  html:
+    output-file: quarto_blatt.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: quarto_folien.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    # layout
+    navigation-mode: linear
+    controls-layout: bottom-right
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # figures
+    fig-cap-location: top
+    fig-width: 8
+    fig-asp: .618
+    # title slide
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: quarto.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: ../../references.bib
+csl: ../../apa.csl
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_quarto.qmd")
+```
+
+
+
+
+# Heutige Ziele {.unnumbered .unlisted}
+
+-   lernen, was dynamische Berichte sind
+-   unser eigenes Quarto-Dokument erstellen
+-   lernen, wie man ein Quarto-Dokument bearbeitet
+-   lernen, wie man Code in ein Quarto-Dokument einfügt
+-   ein Quarto-Dokument in verschiedenen Formaten wiedergeben
+
+## Lust auf mehr Praxis? {.unnumbered}
+
+-   wir können mehr lernen/mehr Übung bekommen, indem wir
+    -   [Kap. 29](https://r4ds.hadley.nz/quarto) und [30](https://r4ds.hadley.nz/quarto-formats) in @wickham_r_2023 (speziell zu Quarto), oder
+    -   [Ch. 2](https://psyteachr.github.io/reprores-v3/repro.html) in @nordmann_applied_2022 (reproduzierbarer Arbeitsablauf im Allgemeinen)
+        -   @nordmann_applied_2022 verwendet Rmarkdown-Skripte, während wir die nächste Generation verwenden werden: Quarto
+        -   wir sollten in Quarto immer noch in der Lage sein, genau die gleichen Dinge zu tun, wie sie in Rmarkdown vorgeschlagen werden
+
+# Wiederholung {.unnumbered .unlisted}
+
+Letzte Woche haben wir gelernt...
+
+- was Datenrahmen sind
+- den Unterschied zwischen kategorialen und kontinuierlichen Daten
+- wie man Diagramme mit `ggplot` erstellt
+- die richtige Darstellung für unsere Daten auszuwählen
+
+## Wiederholung: `ggplot()` {.unnumbered .unlisted}
+
+Sehen Sie sich diesen Code an. Was würde passieren, wenn wir ihn ausführen würden?
+
+
+
+
+```{r}
+library(languageR)
+library(tidyverse)
+df_lexdec <- lexdec
+
+fig_lexdec <-
+  df_lexdec |> 
+  ggplot() +
+  aes(x = RT, fill = Class) +
+  geom_histogram(position = "identity", alpha = .5) +
+  theme_bw()
+```
+
+
+
+
+::: {.content-visible when-format="revealjs"}
+## Wiederholung: `ggplot()` {.unnumbered .unlisted}
+:::
+
+Welche Darstellung in @fig-wiederholung wird durch den folgenden Code erzeugt?
+
+
+
+
+```{r}
+fig_lexdec1 <-
+  df_lexdec |> 
+  ggplot() +
+  aes(x = RT, colour = Class) +
+  geom_density(alpha = .5) +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+
+library(patchwork)
+
+fig_lexdec2 <-
+  df_lexdec |> 
+  ggplot() +
+  aes(x = RT, colour = Class) +
+  geom_density(position = "identity", alpha = .5)
+
+fig_lexdec3 <-
+  df_lexdec |> 
+  ggplot() +
+  aes(x = Class, fill = Class) +
+  geom_bar() +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+#| label: fig-wiederholung
+#| fig-cap: Drei aus dem lexdec-Datensatz generierte Diagramme
+#| fig-asp: .5
+fig_lexdec2 + fig_lexdec3 + fig_lexdec1 +
+  plot_annotation(tag_levels = "A") & theme(legend.position = "bottom")
+```
+
+
+
+
+# Set-up {.unnumbered .unlisted}
+
+- wir müssen eine LaTeX-Distribution verwenden, um PDF-Dokumente mit Quarto zu erstellen
+  + LaTeX ist ein Schriftsatzsystem
+  + TinyTex ist eine eigene LaTeX-Distribution, mit der wir PDFs erstellen können.
+  + Das Paket `tinytex` kann uns helfen, TinyTex zu installieren
+
+## Installation von LaTeX über `tinytex` {.unnumbered .unlisted}
+
+- Führen Sie den folgenden Code *in der Konsole* aus
+- oder, wenn Sie ihn in einem Skript ausführen wollen, um zu dokumentieren, was Sie getan haben, kommentieren Sie ihn nach der Ausführung aus (d.h. fügen Sie ein # davor)
+
+
+
+
+```{r}
+#| eval: false
+# run this in the console
+install.packages("tinytex")
+tinytex::install_tinytex()
+```
+
+
+
+
+## Ordner für Woche 3 {.unnumbered .unlisted}
+
+1.  Fügen Sie einen Unterordner mit dem Namen `03-quarto` in `Notes` hinzu
+2.  Gehen Sie zu Moodle und speichern den Materialordner für '03 - Einführung in Quarto' in Ihrem `moodle` Ordner
+3.  Öffnen Sie das Dokument `_blatt.html` auf Ihren Computer
+    -   Sehen Sie das Dokument an; Sie können oben rechts auf verschiedene Schaltflächen klicken. Probieren Sie es.
+    
+
+
+
+```{r eval = T, fig.env = "figure", fig.align = "center", out.width = "75%", fig.pos="H", set.cap.width=T, fig.cap="Notes folder structure"}
+#| echo: false
+#| label: fig-notes-folder
+
+library(magick)
+magick::image_read(here::here("media/notes_folder.png"))
+```
+
+
+
+
+# Quarto
+
+-   [Quarto](https://quarto.org/) ist ein Dateityp, der dynamische Berichte erstellt
+-   Quarto-Dokumente sehen genauso aus wie ihr Vorgänger, Rmarkdown
+
+## Dynamische Berichte
+
+-   diejenigen, die Text, Code, Codeausgabe enthalten
+-   Quarto bietet ein "unified authoring framework" für Data Science, das Ihren Text, Ihren Code und Ihre Code-Ausgabe einschließt [@wickham_r_2023, Kap 29.1]
+-   Quarto wurde entwickelt, um auf drei Arten verwendet zu werden:
+
+1.  Für die Kommunikation mit Entscheidungsträgern, die sich auf die Schlussfolgerungen und nicht auf den Code hinter der Analyse konzentrieren wollen.
+2. für die Zusammenarbeit mit anderen Datenwissenschaftlern (einschließlich Ihnen in der Zukunft!), die sich sowohl für Ihre Schlussfolgerungen als auch für die Art und Weise interessieren, wie Sie zu ihnen gekommen sind (d. h. für den Code).
+3. als eine Umgebung, in der Datenwissenschaft betrieben wird, als ein modernes Labornotizbuch, in dem wir nicht nur aufzeichnen können, was wir getan haben, sondern auch unsere Gedankengänge.
+
+## R v. Rmarkdown v. Quarto
+
+-   `.R` -Dateien enthalten nur (R-)Quellcode
+-   `.Rmd` *dynamische Berichte* mit
+    -   R-Code (und R-Pakete)
+-   `.qmd` *dynamische Berichte* (RStudio v2022.07 oder später) mit
+    -   R-Code (und R-Pakete)
+    -   Native Unterstützung für Python (und Jupyter-Notebooks)
+    -   Native Unterstützung für Julia
+
+::: {.content-visible when-format="revealjs"}
+## R v. Rmarkdown v. Quarto {.unlisted .unnummbered}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-rstudio]: RStudio version
+::: {#exm-rstudio .custom}
+
+::: nonincremental
+1.  Führen den folgenden Code in der `Konsole` aus: `RStudio.Version()$version`
+    -   wenn die ausgegebene Version `2022.07` oder höher ist, können Sie Quarto benutzen
+    -   wenn nicht:
+2.  Aktualisieren Sie RStudio: `Help > Check for updates`
+:::
+:::
+:::
+
+## Markdown
+
+-   `.md`-Dateien
+-   ein Klartext-Editor-Format, das
+    -   Formatierungselemente hinzufügt, die unabhängig von Gerät und Ausgabeformat sind (PDF, Word-Dokument, html...)
+    -   leicht zu lesen ist
+-   Markdown-Dokumente sind das Bindeglied zwischen unserem Quelldokument (`.qmd`) und unserer Ausgabe (z.B. PDF)
+
+## Folder structure
+
+-   jede `.qmd` sollte (normalerweise) in einem eigenen Ordner sein
+    -   d.h. es sollten nicht mehrere `.qmd` Dateien im selben Ordner sein
+-   dies ist nur mein Vorschlag, um die Ordner ordentlich und organisiert zu halten
+    -   d.h., es gibt keinen technischen Grund dafür (die Dokumente laufen auch dann, wenn sie sich alle im selben Ordner befinden)
+-   werfen wir einen Blick auf einige meiner früheren und aktuellen Projektordner
+
+# Unsere erstes Quarto-Dokument
+
+-   letzte Woche haben wir ein R-Skript erstellt, das wir über Moodle eingereicht haben
+-   wir werden nun unsere erste `.qmd`-Datei erstellen
+-   von nun an wird dies die Datei sein, die wir in Moodle einreichen (kein R-Skript)
+
+::: {.content-visible when-format="revealjs"}
+## Unsere erstes Quarto-Dokument {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+## [Aufgabe @exm-qmd]: erste Quarto
+::: {#exm-qmd .custom}
+
+::: nonincremental
+1.  Erstellen Sie in Ihrem R-Projekt-Ordner, in dem ihr Ihre Kursunterlagen/Notizen aufbewahren, einen neuen Ordner für Woche 3
+2.  `File > New Document > Quarto Document`
+    -   Geben Sie ihm einen Titel wie "Quarto - Woche 3"
+    -   Deaktivieren Sie die Option "open with Visual Editor".
+3.  Schauen das neue Skript an, um mehr über Quarto zu erfahren.
+4.  Klicken Sie auf die Schaltfläche "Render" am oberen Rand des Dokuments
+    -   Speichern Sie das Dokument in dem Ordner für Woche 3, den Sie gerade erstellt haben.
+    -   Was geschiehen? Vergleichen die Ausgabe mit dem Quellcode des Dokuments.
+5.  Gehen Sie zurück zu Ihrem neuen Ordner `03-quarto`
+    -   Was hat sich geändert?
+:::
+:::
+:::
+
+## Quarto-Grundlagen
+
+-   Quarto-Dokumente (wie Rmarkdown) enthalten drei wichtige Arten von Inhalten:
+    1.  den **YAML-Header**, der von `---` umgeben ist
+    2.  Text mit einer einfachen Formatierung oder Strukturierung wie `# Überschrift` oder `*Kursivschrift*`
+    3.  R-Code-Chunk, umgeben von ```` ```{r} ``` ````
+  
+
+
+
+```{r}
+#| code-line-numbers: false
+#| echo: fenced
+# Dies ist ein Code Chunk
+1 + 1
+```
+
+
+
+
+
+## YAML
+
+-   stand ursprünglich für *Yet Another Markup Language*
+    -   wurde aber in *YAML Ain't Markup Language* umbenannt, um den Zweck der Sprache als datenorientiert und nicht als Dokumentauszeichnung zu betonen (laut [Wikipedia](https://en.wikipedia.org/wiki/YAML))
+-   enthält alle Metainformationen zu Ihrem Dokument
+    -   z.B. Titel, Autorenname
+-   auch Formatierungsinformationen
+    -   z.B. Typ der Ausgabedatei
+-   es gibt viele Möglichkeiten der Dokumentformatierung und -anpassung, die wir in diesem Kurs nicht behandeln werden
+    -   aber ich habe zum Beispiel viele YAML-Formatierungsoptionen im Quellcode meiner Folien
+
+::: {.content-visible when-format="revealjs"}
+## YAML {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-YAML]: YAML
+::: {#exm-YAML .custom}
+
+::: nonincremental
+
+1. Ändern Sie den Titel, wenn Sie das tun möchten.
+2. Raten Sie, wie man einen "Untertitel" (EN: subtitle) hinzufügen könnte (Hinweis: es ist ähnlich wie beim Hinzufügen eines `title`)
+3. Fügen Sie einen Autor hinzu, `Autor: "vorname nachname"` (siehe Beispiel unten)
+4. Füge ein Inhaltsverzeichnis hinzu (EN: Table of Contents, `toc`), indem du `format` so änderst, dass es wie folgt aussieht:
+
+
+
+
+```{r}
+#| eval: false
+---
+title: "Quarto - Woche 3"
+author: "Vorname Nachname"
+format:
+  html:
+    toc: true
+---
+```
+
+
+
+
+5.  Rendern nun das Dokument. Sehen Sie Ihre Änderungen?
+:::
+:::
+:::
+
+## Strukturierung Ihres Dokuments
+
+-   wir können unser Dokument strukturieren mit
+    -   `# Überschriften`
+    -   `## Zwischenüberschriften`
+    -   `### Unter-Zwischenüberschriften`, usw.
+
+::: {.content-visible when-format="revealjs"}
+## Strukturierung eures Dokuments {.unlisted .unnumbered}
+:::
+
+
+
+
+```{r}
+#| eval: false
+#| code-line-numbers: false
+---
+title: "Quarto - Woche 3"
+author: "Vorname Nachname"
+format:
+  html:
+    toc: true
+---
+
+# Überschrift 1
+
+Hier ist ein Text über das Thema, das mit dieser Überschrift verbunden ist.
+
+# Überschrift 2
+
+Hier ist ein weiterer Text zu einem anderen Thema.
+
+## Unterüberschrift 2.1
+
+Dies ist ein Text über das Unterthema.
+```
+
+
+
+
+::: {.content-visible when-format="revealjs"}
+## Strukturierung Ihres Dokuments {.unlisted .unnumbered}
+:::
+
+::: callout-note
+### Die Bedeutung der Formatierung
+
+::: nonincremental
+Zwischenüberschriften benötigen ein Leerzeichen nach dem letzten Hashtag (`##Zwischenüberschrift` anstelle von `##Zwischenüberschrift`), um als Überschrift gelesen zu werden. YAML erfordert außerdem einen sehr präzisen Schriftsatz. Da die Abstände in der YAML (und anderswo) so wichtig sind, möchte ich die Leerzeichen sehen und zählen können. Um dies zu tun, geht in RStudio:
+
+-   gehen zu Ihren Globalen Einstellungen (Werkzeuge \> Globale Einstellungen)
+-   unter `Code` (linke Spalte) `> Display` (Tab), markieren das Kästchen `> Show whitespace character`
+:::
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Strukturierung Ihres Dokuments {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-headers]: Überschriften
+::: {#exm-headers .custom}
+
+::: nonincremental
+1.  Kopiern den obigen Code (Überschriften und Unterüberschriften) und ersetzen den Text in der Quarto-Vorlage.
+2.  Ersetzen die erste Überschrift durch den Titel `Quarto`
+    -   Schreiben einen Text, der Quarto beschreibt, unter die Überschrift
+3.  Schreiben eine Unterüberschrift namens `YAML`
+    -   Schreiben einen Text, der die YAML-Struktur beschreibt, die wir besprochen haben
+4.  Erstellen eine Unterüberschrift mit dem Namen `Quarto-Struktur`.
+    -   Schreiben einige Notizen darüber, wie wir ein Quarto-Dokument strukturieren können (z.B. durch das Erstellen von Überschriften)
+5.  Finden Sie in RStudio die Schaltfläche `Outline` oben links im `.qmd` Text Editor Fenster
+    -   Was sehent Sie, wenn Sie darauf klicken?
+:::
+:::
+:::
+
+## Textformatierung
+
+- zum Formatieren von Text müssen wir die Markdown-Syntax verwenden
+
+
+
+
+```{r}
+#| echo: false
+dplyr::tribble(
+  ~"Format", ~"Markdown", ~"Ausgabe",
+  "Kursivschrift", "`Dieser Text ist *kursiv*`", "Dieser Text ist *kursiv*",
+  "Fett", "`Dieser Text ist **fett**`", "Dieser Text ist **fett**",
+  "Subskription", "`Dieser Text ist ~tiefgestellt~`", "Dieser Text ist~tiefgestellt~",
+  "Hochgestelt", "`Dieser Text ist ^hochgestellt^`", "Dieser Text ist ^hochgestellt^"
+) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(
+  columns = c(Markdown, Ausgabe),
+  rows = dplyr::everything(),
+  md_engine = c( "markdown", "commonmark")
+) 
+```
+
+
+
+
+
+## Aufzählungen
+
+-   wir können Aufzählungslisten mit Bindestrichen erstellen.
+    -   Unteraufzählungen müssen eingerückt werden (drückt die Tabulatortaste)
+-   nummerierte Listen können durch einfaches Schreiben einer nummerierten Liste erstellt werden
+    -   Unteraufzählungen müssen in nummerierten Listen *doppelt* eingerückt werden
+
+
+::: {.content-visible when-format="revealjs"}
+## Aufzählungen {.unnumbered .unlisted .uncounted}
+:::
+
+
+
+
+```{r}
+#| eval: false
+#| code-line-numbers: false
+
+- dies ist ein Aufzählungszeichen
+  + dies ist ein Unterpunkt
+
+1. Dies ist ein nummerierter Punkt
+    a. dies ist ein unternummerierter Punkt (beachtt den doppelten Einzug)
+2. dies ist der zweite nummerierte Punkt
+```
+
+
+
+
+- dies ist ein Aufzählungszeichen
+  + dies ist ein Unterpunkt
+
+1. Dies ist ein nummerierter Punkt
+    a. dies ist ein unternummerierter Punkt (beachtt den doppelten Einzug)
+2. dies ist der zweite nummerierte Punkt
+
+::: {.content-visible when-format="revealjs"}
+## Aufzählungen {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-bullets]: Aufzählungen
+::: {#exm-bullets .custom}
+
+::: nonincremental
+1.  Fügen Ihrem `.qmd` Dokumententext eine Textformatierung hinzu.
+2.  Fügen eine Aufzählungsliste hinzu
+3.  Fügen eine nummerierte Liste hinzu
+4.  Rendern Sie das Dokument. Hat es geklappt?
+:::
+:::
+:::
+
+# Codierung in Quarto
+
+-   Der große Vorteil von dynamischen Berichten ist die Integration von Text und Code
+-   Vorletzte Woche haben wir gelernt, wie man einfache mathematische Berechnungen in R durchführt.
+-   wie würden wir R-Befehle in ein `.qmd`-Dokument einfügen?
+    -   Inline-Code (Code, der innerhalb einer Textzeile ausgeführt wird)
+    -   Code-Chunke (ein Code-Chunk, der nicht in Text enthalten ist)
+
+## Code-Chunks
+
+-   Code Chunks sind zwischen ```` ```{r} ```` und ```` ``` ```` eingebettet.
+-   eine schöne Tastenkombination:`Cmd-Option-I` (Mac) oder `Strg-Alt-I` (PC)
+
+
+
+
+```{r}
+#| eval: false
+#| echo: fenced
+
+# Addition
+4+6
+```
+
+
+
+
+-   ihr könnt den Code in Ihrer RStudio-Sitzung ausführen, indem ihr:
+    -   auf das kleine grüne Dreieck oben rechts im Chunk klickt
+    -   die Tastenkombination `Cmd`/`Strg-Enter` verwendt, um eine einzelne Code-Zeile auszuführen (je nachdem, worauf der Cursor steht)
+    -   der Tastenkombination `Cmd`/`Strg-Shift-Enter` benutzt, um den gesamten Code-Chunk auszuführen (falls es mehrere Befehle innerhalb eines einzelnen Abschnitts gibt)
+
+::: {.content-visible when-format="revealjs"}
+## Code-Chunks
+:::
+
+::: callout-tip
+### [Aufgabe @exm-math]: Code-Chunks
+::: {#exm-math .custom}
+
+::: nonincremental
+1.  Füge einen Code Chunk zu deiner `.qmd` Datei hinzu
+    -   Füge einige mathematische Operationen ein (Addition, Subtraktion, etc)
+    -   Fügt informative Anmerkungen zu Ihrem Code hinzu (z.B. `# Addition`)
+2.  Füge einen Text unter deinem Code-Chunk hinzu, der beschreibt, was der obige Code erreicht hat.
+3.  Rendern Sie das Dokument. Hat es geklappt?
+:::
+:::
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Code-Chunks {.unnumbered .unlisted}
+:::
+
+::: callout-note
+### Erinnerung! Überschriften und Code-Anmerkungen
+
+::: nonincremental
+Denken Sie beim Schreiben von Notizen/bei der Bearbeitung von Übungen im Unterricht daran, informative Überschriften/Unterüberschriften zu erstellen! Auf diese Weise wird das Dokument strukturiert und übersichtlich, wenn ihr-in-der-Zukunft (oder ich) darauf zurückblickt.
+
+Überschriften/Zwischenüberschriften strukturieren das gesamte Dokument. Code-Anmerkungen beschreiben, was bestimmte Teile des Codes bewirken (und warum). Beide beginnen mit einem Hashtag + Leerzeichen (`#` ), aber Überschriften stehen außerhalb eines Codeabschnitts, während Codeanmerkungen innerhalb eines Codeabschnitts erscheinen.
+
+Tipp: Klicken Sie auf die Schaltfläche "Outline" oben rechts im Texteditor-Fenster. Was zeigt sie an?
+:::
+:::
+
+## Code-Chunk-Optionen
+
+-   wir können die Ausführung von Code-Chunken steuern
+-   wir wollen nicht immer unseren Code in einem Bericht wiederholen
+    -   wir können dies in jedem Code-Chunk mit `#| echo: true` oder `false` steuern
+-   wir wollen nicht immer unseren Code in einem Bericht ausführen lassen
+    -   wir können dies in jedem Code-Chunk mit `#| eval: true` oder `false` steuern
+
+::: {.content-visible when-format="revealjs"}
+## Code-Chunk-Optionen {.unnumbered .unlisted .unlisted}
+:::
+
+-   Dies würde wie folgt aussehen:
+
+
+
+
+```{r}
+#| echo: fenced
+#| eval: true
+
+# Addition
+4+6
+```
+
+
+
+
+- Wichtig ist, dass die Codechunk-Optionen:
+  - mit `#| ` beginnen, mit einem Leerzeichen dahinter und keinem Leerzeichen davor
+  - direkt unter ```` ```{r} ```` platziert werden
+
+::: {.content-visible when-format="revealjs"}
+## Code-Chunk-Optionen {.unnumbered .unlisted .unlisted}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-concatenate]: `c()`
+::: {#exm-concatenate .custom}
+
+::: nonincremental
+1.  Erinnern Sie sich, dass wir letzte Woche die Funktion `c()` (EN: concatenate) gesehen haben, die mehrere Werte kombiniert (z.B. `mean(c(3,4,25))` ergibt den Mittelwert von 3,4 und 25)
+2.  In einem Code-Stück: Erstellen sie ein Objekt, das eine Liste von Zahlen enthält (z.B. `Objektname <- c(...)`)
+3.  Berechnen Sie den Mittelwert dieser Zahlen, indem Sie nur den Objektnamen verwendt.
+4.  Speichern Sie den Mittelwert dieser Zahlen als ein Objekt
+5.  Rendern Sie das Dokument und seht sich den Abschnitt mit Ihrem Code-Chunk an.
+    -   Ändern Sie nun im Quellcode die Chunk-Einstellungen auf `echo: false` und rendern das Dokument. Was ändert sich?
+    -   Setzen nun `echo: true`, aber `eval: false`. Rendern das Dokument. Was ändert sich?
+:::
+:::
+:::
+
+# Plots in Quarto
+
+- Ein großer Vorteil der gerenderten Quarto-Dokumente besteht darin, dass wir unsere Abbildungen zusammen mit den Textbeschreibungen anzeigen können
+- Lassen Sie uns versuchen, eine Handlung von letzter Woche in unserem neuen Quarto-Dokument zu reproduzieren
+
+## Set-up
+
+- unsere Pakete in einen Codechunk laden: `tidyverse`, `languageR`, und `ggthemes`
+
+
+
+
+```{r}
+#| echo: fenced
+
+# Pakete laden
+library(tidyverse)
+library(languageR)
+library(ggthemes)
+```
+
+
+
+
+- unsere Daten in einen separaten Codechunk laden (am besten ist es, einen einzigen Codechunk für einen einzigen Zweck zu verwenden)
+
+
+
+
+```{r}
+#| echo: fenced
+
+# Daten laden
+df_lexdec <- lexdec
+```
+
+
+
+
+## Plots in Quarto
+
+- Erstellen Sie jetzt einfach einen neuen Codechunk, der einen Code von letzter Woche enthält
+- wir speichern es als Objekt mit dem Namen `fig_lexdec_hist`:
+
+
+
+
+```{r}
+#| label: fig-hist
+#| fig-cap: Histogram of reactiontimes per native language from lexdec
+#| output-location: column-fragment
+
+## histogram of reaction times by native language
+  ggplot(data = df_lexdec) +
+  aes(x = exp(RT), fill = NativeLanguage) + ## set aesthetics
+  geom_histogram(position = "identity", alpha = 0.3) +
+  scale_fill_colorblind() + ## make fill colorblind friendly
+  theme_minimal() ## set plot theme
+```
+
+
+
+
+## Plots drucken
+
+- Erinnern Sie sich an die letzte Woche: Wenn Sie einen Plot benennen, wird er nur gedruckt, wenn Sie den Namen des Objekts eingeben 
+- wenn Sie den Plot nicht als Objekt speichern, wird er gedruckt, wenn Sie den Code ausführen, der den Plot erzeugt
+- Wenn Sie den Plot als Objekt speichern, wird er nicht gedruckt, wenn Sie den Code ausführen.
+    - In diesem Fall müssen Sie den Objektnamen ausführen, um zu sehen, was unter diesem Namen gespeichert ist
+    - Dies gilt für alle Arten von Objekten, nicht nur für Diagramme! 
+    
+
+::: {.content-visible when-format="revealjs"}
+## Plots in Quarto {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+### [Aufgabe @exm-plots]: Plots in Quarto
+::: {#exm-plots .custom}
+
+::: nonincremental
+1. Einen neuen Codeabschnitt erstellen und das Balkendiagramm von letzter Woche erzeugen, aber als Objekt speichern
+2. In einem separaten Codechunk nur den Objektnamen dieses Diagramms angeben
+3. Rendern Sie das Dokument, um zu sehen, wo die Abbildung gedruckt wurde.
+
+:::
+:::
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Plots in Quarto {.unlisted .unnumbered}
+:::
+
+
+
+
+```{r}
+fig_lexdec_l1 <-
+  ggplot(data = df_lexdec) +
+  aes(x = NativeLanguage, fill = NativeLanguage) +
+  # add the geom:
+  geom_bar() +
+  scale_fill_colorblind() + # add colourblind colours
+  theme_minimal()
+```
+
+```{r}
+#| label: fig-barplot
+#| fig-cap: Barplot of observations per native language
+#| fig-asp: .7
+#| output-location: fragment
+fig_lexdec_l1
+```
+
+
+
+
+# Ausgabeformate {.unlisted}
+
+-   es gibt mehrere Ausgabeformate, die wahrscheinlich nützlichsten sind:
+    -   `html` (default)
+    -   `pdf`
+    -   `revealjs` (Folien)
+    -   `docx`
+
+## Ausgabeformate
+
+-   wenn wir das Dokument rendern:
+    1.  Quarto sendet die `.qmd`-Datei an [`knitr`](https://yihui.org/knitr/) (ein R-Paket für dynamische Berichte mit R)
+    2.  `knitr` führt die Code-Chunke aus und erstellt ein neues `.md` Dokument mit Code und Ausgabe
+    3.  die `.md`-Datei wird von [`pandoc`](https://pandoc.org) verarbeitet, das `.md`-Dateien in die fertige Datei konvertieren kann, mit vielen Ausgabeformaten
+
+
+
+
+```{r}
+#| echo: false
+#| fig-cap: "Diagramm des Quarto-Workflows von qmd, zu knitr, zu md, zu pandoc, zur Ausgabe im PDF-, MS Word- oder HTML-Format. (Quelle: @wickham_r_2023)"
+#| label: knitr
+knitr::include_graphics(here::here("media","Wickham_Ch29_knitr.png"))
+```
+
+
+
+
+::: {.content-visible when-format="revealjs"}
+## Ausgabeformate {.unlisted .unnumbered}
+:::
+
+::: callout-note
+## Andere Verwendungen
+
+::: nonincremental
+Quarto kann für eine Vielzahl von Zwecken verwendet werden, wie z. B.:
+
+-   Websites/Blogs
+-   Notizen machen
+-   Dokumentieren von allem, was mit Code zu tun hat, um die Reproduzierbarkeit zu verbessern
+    -   Tipps zum Arbeitsablauf
+    -   Bearbeitung von csv-Dateien (z. B. Stimuluslisten)
+:::
+:::
+
+::: {.content-visible when-format="revealjs"}
+# Ausgabeformate {.unnumbered .unlisted}
+:::
+
+::: callout-tip
+
+## [Aufgabe @exm-formats]: Ausgabeformate
+
+::: {#exm-formats .custom}
+
+::: nonincremental
+1.  Ersetzt `html` in der YAML durch `revealjs`. Rendert das Dokument.
+    -   Schauen Sie den Ordner für die Notizen dieser Woche an. Welche Dateien seht?
+2.  Setzt nun `format` auf `pdf`. Rendert das Dokument.
+    -   Läuft es?
+    -   Versuche, `pdf` durch den Buchstaben `l` zu ersetzen. R schlägt eine Vervollständigung vor, welche ist es? Wähle sie aus und rendere das Dokument.
+3.  Setzt das Format wieder auf `html`. Rendert das Dokument.
+4.  Geht zurück zu Ihrem Ordner mit den Notizen dieser Woche. Welche Dateien seht?
+    -   Ist die Ausgabe von `revealjs` dort?
+    
+:::
+:::
+:::
+
+# Heutige Ziele 🏁 {.unnumbered .unlisted}
+
+Heute haben wir...
+
+-   gelernt, was dynamische Berichte sind ✅
+-   unser eigenes Quarto-Dokument erstellt ✅
+-   gelernt, wie man ein Quarto-Dokument bearbeitet ✅
+-   gelernt, wie man Code in ein Quarto-Dokument einfügt ✅
+-   ein Quarto-Dokument in verschiedenen Formaten wiedergebt ✅
+
+## Extra: Reproduzierbarkeit in Quarto
+
+-   die Paketversionen mit `sessionInfo()` ausgeben
+    -   wenn ich ein neues Dokument beginne, ist eines der ersten Dinge, die ich tue, eine Kopfzeile `# Session Info` am unteren Ende hinzuzufügen, mit dem folgenden:
+
+
+
+
+```{r}
+#| eval: false
+sessionInfo()
+```
+
+
+
+
+::: callout-tip
+
+### [Aufgabe @exm-sessionInfo]: Session Info
+
+::: {#exm-sessionInfo .custom}
+
+-   fügt eine "Session Info" Abschnitt am Ende des Dokuments hin
+:::
+
+:::
+
+# Session Info {.unnumbered .unlisted}
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.3.0.386 (Cherry Blossom).
+
+
+
+
+```{r}
+sessionInfo()
+```
+
+```{r}
+#| eval: false
+#| echo: false
+quarto::quarto_render(output_format = "all")
+```
+
+
+
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
+

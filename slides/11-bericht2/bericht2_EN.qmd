@@ -1,0 +1,293 @@
+---
+title: "Analysebericht: Wrangling und Datenvisualisierung"
+subtitle: "Bericht 1"
+author: "VORNAME NACHNAME"
+institute: Humboldt-Universität zu Berlin
+lang: de
+date: "`r Sys.Date()`"
+format:
+  html:
+    output-file: bericht1_DE_blatt_Loesung.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    code-overflow: wrap
+    # code-tools: true
+    self-contained: true
+  pdf:
+    output-file: bericht1_DE_Loesung.pdf
+    toc: true
+    papersize: a4paper
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: references.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, eval=TRUE, echo = FALSE}
+# set this to TRUE if you want to provide the results/answers; then also add 'code-tools: true' to the YAML
+# set this to FALSE if this is the version to be sent describing the assignment
+
+options(scipen=999)
+
+# ANSWERS_MODE <- "instructions" # instructions only
+# ANSWERS_MODE <- "output" # output only but not the code
+ANSWERS_MODE <- "answers" # code and output
+```
+
+```{r, eval = if (ANSWERS_MODE == 'instructions') TRUE else FALSE, echo = FALSE}
+
+knitr::opts_chunk$set(eval = F, # evaluate chunks
+                      echo = F, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = if (ANSWERS_MODE == 'output') TRUE else FALSE, echo = FALSE}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = F, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = if (ANSWERS_MODE == 'answers') TRUE else FALSE, echo= if (ANSWERS_MODE == 'answers') TRUE else FALSE}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+#| results: hide
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("inclass.qmd")
+```
+
+
+*This report is shared with you as an incomplete Quarto script. Your task is to follow the instructions to complete the script. The instructions are preceded by a `>`, in order to differentiate them from your own text that you will include to describe your data.*
+
+
+# Set-up
+
+Run the following code to set-up your environment for the following tasks.
+
+## Packages
+
+Load in the necessary packages.
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(
+  tidyverse,
+  here,
+  janitor,
+  patchwork
+)
+```
+
+## Load data
+
+Below is a code chunk that loads in a data set from @biondo_yesterday_2022, an eye-tracking during reading study. This dataset must first be downloaded and saved in your `daten` folder. 
+
+The data contains eye-tracking reading times across sentence regions for Spanish sentences with a future or past refering temporal adverb near the beginning of the sentence and a verb in the past or future tense later in the sentence. A critical manipulation was whether the verb tense matched or mismatched the preceding temporal adverb. Our variables of interest are:
+
+  + `verb_t`: verb tense (Past or Future)
+  + `gramm`: grammaticality (`gramm` or `ungramm`)
+  + `roi`: region of interest (`2` = adverb, `4` = verb)
+  + the measures 
+    +`fp`: first-pass reading time, (the duration of the gaze to the region upon first seeing it) and
+    + `tt`: total reading time, (the total duration of the eye gaze in the region for the entirety of the sentence presentation)
+
+Longer eye-tracking reading times are typically linked to difficulties in languauge comprehension. For example, syntactically complex (versus simplex) sentences or words which are ungrammatical (versus grammatical) given the preceding context have been found to elicit longer reading times. For this reason, we would expect to find longer reading times for the ungrammatical versus grammatical conditions. Another research question from @biondo_yesterday_2022 was whether there were differences in processing (i.e., reading times) between the Past and Future tenses.
+
+```{r}
+#| echo: true
+df_biondo <-
+  read_csv(here("daten", "Biondo.Soilemezidi.Mancini_dataset_ET.csv"),
+           locale = locale(encoding = "Latin1")) |> 
+  clean_names() |> 
+  mutate(gramm = ifelse(gramm == 0, "ungramm", "gramm")) |> 
+  filter(adv_type == "Deic",
+         roi %in% c(2,4))
+```
+
+## Data Wrangling 1: transformation
+
+Using pipes (`|>`), add to the code chunk above:
+
+  + a line where you rename the variable `verb_t` to `tense`
+  + a line where you select only the variables `roi`, `label`,  `tense`,  `gramm`, `fp`, and `tt`
+
+You should then have a data frame with 7680 observations and 6 variables.
+
+```{r}
+#| eval: true
+df_biondo <-
+  read_csv(here("daten", "Biondo.Soilemezidi.Mancini_dataset_ET.csv"),
+           locale = locale(encoding = "Latin1")) |> 
+  clean_names() |> 
+  mutate(gramm = ifelse(gramm == 0, "ungramm", "gramm")) |> 
+  filter(adv_type == "Deic",
+         roi %in% c(2,4)) |> 
+  rename(
+    tense = verb_t
+  ) |> 
+  select(roi, label, tense, gramm, fp, tt)
+```
+
+# Plot interpretation: distribution
+
+Look at @fig-distribution A and B, and describe the plots. They both contain data from the verb region of a sentence only (`roi == 4`). Give the approximate mode and minimum and maximum values for the whole dataset (@fig-distribution A), and the median, minimum, and maximum value per condition (@fig-distribution B).
+
+```{r}
+#| eval: true
+fig_distribution <-
+  df_biondo |> 
+  filter(roi == 4) |> 
+  ggplot() +
+  aes(x = tt) +
+  geom_histogram() +
+  theme_bw() +
+  
+df_biondo |> 
+  filter(roi == 4) |> 
+  ggplot() +
+  aes(x = tense, y = tt,
+      colour = gramm) |> 
+  geom_boxplot() +
+  theme_bw() 
+
+ggsave(here("figures", "bericht3", "fig_distribution.png"), fig_distribution,
+       width = 20,
+       height = 10,
+       units = "cm",
+       scale = .85)
+
+# now in Terminal: push figure to github repo
+```
+
+```{r}
+#| eval: true
+#| label: fig-distribution
+#| fig-cap: Plots to be interpreted
+#| fig-asp: .5
+fig_distribution + plot_annotation(tag_levels = "A")
+
+```
+
+
+# Data wrangling 2: tidying
+
+Use the `pivot_longer()` function to lengthen the dataset, where the columns (`cols =`) `fp` and `tt` become one column (`names_to = `)called `measure`, and their values are stored in a column (`values_to = `) called `time`. Save the result as `df_longer`. It should have 15360 observations and 6 columns.
+
+```{r}
+#| echo: true
+df_longer <-
+```
+
+```{r}
+df_longer <-
+  df_biondo |> 
+  pivot_longer(
+    cols = c(fp, tt),
+    names_to = "measure",
+    values_to = "time"
+  )
+```
+
+# Summary statistics
+
+Using the `summarise()` function, produce the mean and standard deviation of `time`. Group the results by `measure`, `tense` `gramm`, and `roi` (by either using `.by =` or `group_by()`).
+
+```{r}
+#| echo: true
+sum_et <-
+```
+
+```{r}
+sum_et <-
+  df_longer |> 
+  drop_na() |> 
+  summarise(
+    mean = mean(time),
+    sd = sd(time),
+    .by = c(measure, tense, gramm, roi)
+  )
+```
+
+Print the summary.
+
+```{r}
+sum_et
+```
+
+# Visualising summary statistics
+
+In this task you will produce two errorbar plots and print them side-by-side.
+
+## Adverb region
+
+Generate an errorbar plot called `fig_adverb` for the `adverb` region (`roi == 2`) of the summary you just produced, with the following aesthetics:
+  + grammaticality on the x-axis
+  + mean on the y-axis
+  + tense as colour and shape
+  + errorbars with +/- 1 standard deviation
+  + facets for measure
+  + an appropriate plot title and x and y axis labels
+  
+```{r}
+#| echo: true
+fig_adverb <-
+```
+
+## Verb region
+
+Generate the same plot for the `verb` region (`roi == 4`) called `fig_verb`.
+
+**Hint:** You can just copy the code from the adverb region plot, and change the region (`roi`) to the verb!
+
+```{r}
+#| echo: true
+fig_verb <-
+```
+
+
+```{r}
+sum_et |> 
+  filter(roi == 4) |> 
+  ggplot() +
+  aes(x = gramm, y = mean,
+      colour = tense, shape = tense,
+      group = tense) +
+  geom_point(
+                position = position_dodge(.2)) +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),
+                width = .2,
+                position = position_dodge(.2)) +
+  facet_grid(~measure) +
+  geom_line(
+                position = position_dodge(.2))
+```
+
+
+  
+## Print plots
+
+Plot your two errorbar plots side-by-side by using the `patchwork` package
+
+
+# Plot interpretation: summary statistics
+
+Describe any differences between the conditions and regions based on the summary you produced and the plots generated from the summary.
+
+
+
+

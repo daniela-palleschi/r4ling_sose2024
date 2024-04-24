@@ -1,0 +1,646 @@
+---
+title: "Quarto 2"
+subtitle: "Code-Chunk-Optionen und Querverweise"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 7 - Quarto 2" 
+lang: de
+date: "`r Sys.Date()`"
+format: 
+  html:
+    output-file: quarto2_blatt_DE.html
+    include-after-body: custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: quarto2_folien_DE.html
+    include-after-body: custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: quarto2_DE.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: references/references.bib
+csl: references/apa.csl
+---
+
+```{r}
+#| echo: false
+#| label: setup
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+
+```{r, eval = T, cache = F}
+#| echo: false
+#| label: rbbt
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_quarto2_DE.qmd")
+```
+
+# Fragen zum Bericht {.unnumbered .unlisted}
+
+Geht zu [menti.com](menti.com) und gebt den Code auf dem nächsten Bildschirm ein
+
+# Update: Leistungspunkte {.unnumbered}
+
+-   Studienleistungen
+    -   3LP
+        -   1LP: Hochladen des wöchentlichen Programmierungsskripts (mindestens 8 von den 13 Wochen)
+        -   ~~1LP~~ ***2LP***: zwei "in-class" Übungen ~~(je 0,5LP)~~ ***(je 1LP)***
+        -   ~~1LP: Hausarbeit (fällig am 15. August)~~
+
+# Wiederholung {.unnumbered}
+
+Letzte Woche haben wir...
+
+- einen Bericht über Eye-Tracking-Lesedaten von @biondo_yesterday_2022 erstellt
+- bekannte und neue Diagrammtypen interpretiert
+- bekannte Darstellungsformen reproduziert
+
+## Histogramm und Dichtediagramm {.unnumbered .smaller}
+
+```{r}
+#| eval: true
+#| echo: false
+#| label: fig-density-histo
+
+# recreate density/histgram from Bericht 1
+
+## Packages
+pacman::p_load(tidyverse,
+               here,
+               patchwork)
+
+## Load data
+
+df_resp <- read_csv(here("daten", "Biondo_etal_2021.csv")) %>% 
+  rename(tense = Tense_type,
+         item = Item.num,
+         rt = RT,
+         tt = totalTime) %>% 
+  relocate(tense, .before = verb) %>% 
+  relocate(gramm, .after = verb) %>% 
+  arrange(subj, item)
+
+## Histogram: rt by accuracy
+
+fig_density <- df_resp %>% 
+  ggplot(aes(x = rt, fill = as_factor(acc), colour = as_factor(acc))) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Reaction times per accuracy level",
+       x = "Reaction times (ms)",
+       y = "Density",
+       fill = "Accuracy",
+       colour = "Accuracy") +
+  theme_minimal()
+
+## Density plot: rt by accuracy
+
+fig_histogram <- df_resp %>% 
+  ggplot(aes(x = rt, fill = as_factor(acc), colour = as_factor(acc))) +
+  facet_grid(.~as_factor(acc)) +
+  geom_histogram(alpha = 0.4) +
+  labs(title = "Reaction times per accuracy level",
+       x = "Reaction times (ms)",
+       y = "Count",
+       fill = "Accuracy",
+       colour = "Accuracy") +
+  theme_bw()
+```
+
+
+:::: columns
+
+::: {.column width="50%"}
+
+1. Was zeigen diese Diagramme?
+    - Verteilung der Reaktionszeiten pro Genauigkeitsstufe
+2. Was stellen die Spitzenwerte dar (z. B. Mittelwert, Median, Modus)?
+    - die *Modus*-Reaktionszeit pro Genauigkeitsstufe
+3. Gibt es einen (ungefähr) gleichen Anteil an richtigen (1) und falschen (0) Antworten? Wie kann man das feststellen?
+    - Nein, es gibt viel mehr korrekte Antworten, das sieht man im Histogramm, das die Anzahl der Beobachtungen (y-Achse: Anzahl) pro Reaktionszeit-Bin (x-Achse) zeigt
+
+:::
+::: {.column width="50%"}
+```{r}
+#| eval: true
+#| echo: false
+#| label: fig-density-histo-print
+#| fig-cap: "Dichte- und Histogrammdiagramme"
+#| fig-width: 6
+#| out-width: "80%"
+#| fig-asp: 0.8
+
+((plot_spacer() + fig_density + plot_spacer() + plot_layout(nrow = 1, widths = c(.15,.7,.15))) /
+   fig_histogram) +
+  plot_layout(nrow = 2) +
+  plot_annotation(tag_levels = "A")
+```
+
+:::
+::::
+
+# Heutige Ziele {.unnumbered}
+
+Heute werden wir...
+
+- lernen, wie man Code-Chunk-Optionen verwendet
+- lernen, wie man die Größe von Abbildungen kontrolliert
+- lernen, wie man Abbildungsunterschriften hinzufügt
+- lernen, wie man formatierte Tabellen druckt
+- lernen, wie man Querverweise erstellt
+
+## Lust auf mehr? {.unnumbered}
+
+- Ch. 29 ([Quarto](https://r4ds.hadley.nz/quarto.html)) in @wickham_r_nodate
+  - Absatz 29.5 ([Code Chunks](https://r4ds.hadley.nz/quarto.html#code-chunks))
+  - Absatz 29.6 ([Figures](https://r4ds.hadley.nz/quarto.html#sec-figures))
+  - Absatz 29.7 ([Tables](https://r4ds.hadley.nz/quarto.html#tables))
+
+# Einrichtung
+
+::: {.column width="100%"}
+1. Neuer Ordner für diese Woche
+2. Neues Quarto-Dokument
+3. YAML aktualisieren
+3. Pakete laden
+    - `tidyverse`
+    - `knitr` (neu)
+    - `kableExtra` (neu)
+4. Ladet die Daten der Datei `flight.csv` ein
+:::
+  
+:::: columns
+::: {.column width="50%"}
+```{r}
+#| label: packages
+pacman::p_load(tidyverse, 
+               knitr,
+               kableExtra)
+```
+:::
+::: {.column width="50%"}
+```{r}
+df_flights <- read_csv(here::here("daten",
+                                  "flights.csv"))
+```
+:::
+::::
+
+# Code chunks
+
+Abkürzungen:
+
+  - `Cmd/Strg+Alt+I`: neuen Code-Chunk einfügen
+  - `Cmd/Strg+Enter`: eine einzelne Code-Zeile ausführen
+  - `Cmd/Strg+Shift+Enter`: ganzen Code-Chunk ausführen
+  
+- Code Chunks sollten relativ in sich geschlossen (*self-contained*) sein
+  + und auf eine einzige Aufgabe fokussiert sein
+
+## Chunk labels
+
+- wir können jedem Code-Chunk Spezifikationen geben, indem wir `#|` *direkt* unter ````{r}`
+  - `#| label: simple-math` wird den Chunk `simple-math` nennen
+  
+```{r}
+#| echo: fenced
+#| label: simple-math
+
+4 + 4
+```
+
+### Vorteile der Verwendung von Chunk-Labels
+
+1. Über das Dropdown-Menü im Skript-Editor können wir zu bestimmten Code Chunks navigieren
+2. Grafiken (z. B. Plots), die von Chunks erzeugt werden, erhalten nützliche Namen, die das spätere Auffinden erleichtern (mehr dazu in Kürze)
+
+---
+
+### Chunk-Chunks sollten...
+
+  + kurz und informativ sein
+  + keine Leerzeichen enthalten (`-` oder `_` verwenden)
+  *einmalig* im Dokument sein (nicht wiederholt)
+  
+---
+
+::: {.callout-note}
+### Eindeutige Chunk-Labels
+
+Chunk-Labels müssen innerhalb eines Skripts *immer* eindeutig sein!
+
+- Wenn dies nicht der Fall ist, erhalten wir beim Rendern eine Fehlermeldung und das Dokument wird nicht gerendert
+- Wir erhalten eine informative Fehlermeldung im Fenster 'Background Jobs', wenn wir doppelte Chunk-Labels haben, also ***immer die Fehlermeldung lesen***! Sie können bei der Fehlersuche sehr hilfreich sein.
+
+```{r}
+#| label: fig-duplicate-chunk-error
+#| fig-cap: "Error message when multiple code chunks have the same label `simple-math`"
+#| out-width: "70%"
+#| echo: false
+knitr::include_graphics(here::here("media", "Screenshot_duplicateChunk.png"))
+```
+
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-chunk-labels]: Chunk labels
+::: {#exm-chunk-labels .custom}
+::: nonincremental
+1. Fügt ein Chunk-Label zu eurem Code-Chunk hinzu, in den ihr Pakete geladen habt
+1. Fügt einen Code Chunk mit dem Tastaturkürzel `Cmd/Strg-Alt-I` hinzu und fügt einige einfache mathematische Berechnungen hinzu
+2. Fügt ein Chunk-Label hinzu
+4. Probiert die Chunk-Navigationsleiste am unteren Rand des Quelltextfensters aus, um zwischen Code Chunks zu springen
+5. Rendert das Dokument
+:::
+:::
+:::
+
+## Chunk-Optionen {.smaller}
+
+- Die Chunk-Ausgabe kann mit **Optionen** formatiert werden, die R mitteilen, was mit dem Code beim Rendern eures Dokuments geschehen soll
+  + es gibt fast 60 Optionen!
+  + Die wichtigsten Optionen steuern, ob euer Code-Chunk beim Rendern ausgeführt wird und welche Ergebnisse im Ausgabebericht gedruckt werden:
+
+- `eval: false` verhindert, dass der Code in der gerenderten Ausgabe *ausgedruckt* wird
+- `include: false` führt den Code aus, zeigt aber weder den Code noch die Ergebnisse im endgültigen Dokument an.
+- `echo: false` verhindert, dass der Code, aber nicht die Ausgabe, in der gerenderten Ausgabe erscheint
+- `message: false` oder `warning: false` verhindert, dass Meldungen oder Warnungen in der gerenderten Ausgabe erscheinen
+- `results: hide` blendet die gedruckte Ausgabe aus; `fig-show: false` blendet Plots aus
+- `error: true` rendert das Dokument, auch wenn Fehler aufgetreten sind
+
+---
+
+Wird der folgende Codeabschnitt in der gerenderten Ausgabe erscheinen?
+Wird der Code ausgeführt werden?
+
+```{r}
+#| echo: fenced
+#| eval: true
+#| label: df-flights1
+#| message: false
+
+df_flights <- read_csv(here::here("daten", "flights.csv"))
+```
+
+---
+
+Wird der folgende Codeabschnitt in der gerenderten Ausgabe erscheinen?
+Wird der Code ausgeführt werden?
+
+```{r}
+#| echo: fenced
+#| eval: false
+#| label: df-flights2
+#| message: false
+
+fig_flights <- read_csv(here::here("daten", "flights.csv")) %>% 
+  filter(month == 12) %>% 
+  ggplot(aes(x = dep_delay, y = arr_delay, colour = carrier)) +
+  geom_point() +
+  theme_minimal()
+```
+
+---
+
+Die folgende Tabelle fasst zusammen, welche Arten von Ausgaben jede Option ***unterdrückt***:
+
+| Option           | Run code | Show code | Output | Plots | Messages | Warnings |
+|------------------|:--------:|:---------:|:------:|:-----:|:--------:|:--------:|
+| `eval: false`    |    X     |           |   X    |   X   |    X     |    X     |
+| `include: false` |          |     X     |   X    |   X   |    X     |    X     |
+| `echo: false`    |          |     X     |        |       |          |          |
+| `results: hide`  |          |           |   X    |       |          |          |
+| `fig-show: hide` |          |           |        |   X   |          |          |
+| `message: false` |          |           |        |       |    X     |          |
+| `warning: false` |          |           |        |       |          |    X     |
+
+- Für den Rest des Kurses werden wir nur noch `eval`, `echo`, `include` und `message` verwenden
+
+## Globale Optionen
+
+- die eben erwähnten Chunk-Optionen können auch *global* für euer gesamtes Dokument gesetzt werden, indem ihr sie in eurer YAML unter `excute:` hinzufügen
+
+```{r}
+#| eval: false
+#| code-line-numbers: false
+title: "My report"
+format:
+  html:
+    toc: true
+execute:
+  echo: false
+```
+
+- und dann können nachfolgende Code-Chunks die globale Einstellung von Fall zu Fall außer Kraft setzen
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-chunk-options]: Chunk options
+::: {#exm-chunk-options .custom}
+::: nonincremental
+1. Einen neuen Codechunk hinzufügen
+    + fügt einige einfache mathe,atische Berechnungen hinzu (z.B., `5*13`)
+3. Gib dem Code Chunk ein Label
+3. Füge die Chunk-Labels `eval: false` und `echo: true` hinzu
+4. Rendert das Dokument.
+    + Wird der Code gedruckt?
+    + Wird das Ergebnis gedruckt? Warum oder warum nicht?
+:::
+:::
+:::
+
+# Tabellen
+
+- wir können Tabellen so ausgeben, wie wir sie in der Konsole sehen
+- wir können auch weitere Formatierungen mit der Funktion `kable()` aus dem Paket `knitr` hinzufügen
+
+:::: columns
+
+::: {.column width="40%"}
+
+```{r}
+#| output-location: fragment
+df_flights %>% 
+  select(1:5) %>% 
+  head()
+```
+:::
+
+::: {.column width="60%"}
+
+```{r}
+#| output-location: fragment
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable()
+```
+:::
+
+::::
+
+### Tabellenbeschriftungen
+
+- wir können der Tabelle auch eine Beschriftung hinzufügen, indem wir ein `label:`
+  + und muss mit `tbl-` für Tabellen beginnen
+- Wir können auch eine Tabellenbeschriftung hinzufügen (`tbl-cap:`), die über der Tabelle gedruckt wird, wenn wir das Dokument rendern hinzufügen
+
+---
+
+:::: columns
+
+::: {.column width="50%"}
+
+```{r}
+#| echo: fenced
+#| output-location: fragment
+#| label: tbl-flights
+#| tbl-cap: "A table made with `knitr`."
+
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable(
+  ) %>%
+  kable_styling(font_size = 25) # from kableExtra
+```
+
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: fenced
+#| output-location: fragment
+#| label: flights
+#| tbl-cap: "A table made with `knitr`."
+
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable(
+  ) %>%
+  kable_styling(font_size = 25) # from kableExtra
+```
+
+:::
+
+::::
+
+### Spaltennamen
+
+- Zum Schluss drucken wir noch bessere Spaltennamen
+
+```{r}
+#| echo: fenced
+#| output-location: column-fragment
+#| label: tbl-flights2
+#| tbl-cap: "A table made with `knitr`."
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable(
+    col.names = c("Year", "Month", "Day", 
+                  "Dep. Time", "Sched. Dep. Time")
+  ) %>%
+  kable_styling(font_size = 25) # from kableExtra
+```
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-tables]: Tables
+::: {#exm-tables .custom}
+::: nonincremental
+1. Kopiere den Code von der letzten Folie (aus dem HTML, PDF oder den Folien)
+2. Fügt ein Tabellenetikett und eine Beschriftung ein
+3. Rendert das Dokument
+4. Ist die Tabelle gedruckt? Hat sie eine Tabellennummer?
+
+:::
+:::
+:::
+
+# Figuren
+
+## Figurenbeschriftung
+
+- Beschriftungen (`label`s) für Code Chunks, die eine Abbildung *ausdrucken*, müssen mit `fig-` beginnen
+  + die Figur hat dann eine Nummer, wenn sie gedruckt wird
+
+```{r}
+#| echo: false
+fig_flights <- df_flights %>%
+  filter(month == 12) %>%
+  ggplot(aes(x = dep_delay, y = arr_delay, colour = carrier)) +
+  geom_point() +
+  labs(
+    title = "December departure and arrival delay",
+    x = "Departure delay (mins)",
+    y = "Arrival delay (mins)",
+    colour = "Airline"
+  ) +   theme_minimal()
+```
+
+```{r}
+#| label: fig-flights-dec120
+#| echo: fenced
+
+fig_flights
+```
+
+
+## Abbildungsbeschriftung
+
+- `fig-cap:` fügt eine Bildunterschrift ein, die im gerenderten Dokument erscheint
+  + die Beschriftung immer mit Anführungszeichen umschließen! z.B., `fig-cap: "..."`
+
+```{r}
+#| label: fig-flights-dec120-2
+#| fig-cap: "Departure delay by arrival delay for December 2013. Airline is indicated via point colour."
+#| echo: fenced
+
+fig_flights
+```
+
+## Größe der Figuren
+
+- Eine große Herausforderung bei Grafiken in Quarto ist es, die Figuren in die richtige Größe und Form zu bringen
+- Es gibt fünf Hauptoptionen, die hilfreich sein können:
+  + `fig-width:` legt die Breite der Figur in Zoll fest (z.B. `fig-width = 4`)
+  + `fig-height:` legt die Höhe der Figur in Zoll fest (z. B. `fig-height = 4`)
+  + `fig-asp:` legt das Seitenverhältnis der Figur fest (wenn Sie nur Höhe oder Breite festlegen; z. B. `fig-asp = 0,618`)
+  + `out-width:` legt die Breite der Figur in Prozent der Zeilenbreite fest (z. B. `out-width = "70%"`)
+  + `out-height:` setzt die Höhe der Figur in Prozent zur Zeilenbreite (z.B. `out-height = "30%"`)
+  + `fig-align: centre` zentriert die Abbildung auf der Ausgabeseite
+  
+---
+
+Wie wird die Größe dieser Figur aussehen?
+
+```{r}
+#| label: fig-flights-dec120-3
+#| fig-cap: "Departure delay by arrival delay for December 2013. Airline is indicated via point colour."
+#| out-width: "60%"
+#| fig-asp: .618
+#| fig-align: center
+#| echo: fenced
+#| output-location: fragment
+
+fig_flights
+```
+
+# Querverweise
+
+- Wir können auch im Text auf Diagramme oder Tabellen verweisen, indem wir `@` gefolgt vom `label` eingeben
+  - z.B.: Dies ist ein Text, der `@fig-flights-dec120` beschreibt.
+
+--- 
+
+Also der Text:
+
+> `@fig-flights-dec120-3` zeigt die Abflug- und Ankunftsverspätungen für Dezember 2013.  `@fig-flights-dec120` zeigt ebenfalls diese Daten, hat aber keine Beschriftung. Die Datei `@fig-flights-dec120-2` zeigt ebenfalls diese Daten und hat eine Beschriftung, ist aber nicht vergrößert.
+
+Wird gedruckt:
+
+> @fig-flights-dec120-3 zeigt die Abflug- und Ankunftsverspätungen für Dezember 2013.  @fig-flights-dec120 zeigt ebenfalls diese Daten, hat aber keine Beschriftung. @fig-flights-dec120-2 zeigt ebenfalls diese Daten und hat eine Beschriftung, ist aber nicht vergrößert.
+
+# Aufgaben {.smaller}
+
+Erstellt eine Kopie eures Berichts von letzter Woche und:
+
+1. Ändert die ***globalen Chunk***-Optionen (in der YAML) so, dass Meldungen und Code standardmäßig nicht in der Ausgabedatei ausgegeben werden.
+    + Hinweis: Sie tun dies mit `execute` und `include: false`.
+3. Ändert die ***globalen Chunk***-Optionen (in der YAML) so, dass alle Figuren `fig-out: 6` und `fig-align: center` haben
+4. Benutzt `knitr::kable()`, um die Tabellen zu drucken, die ihr gedruckt habt.
+    + Füge ein `label` und `tbl-caption` hinzu
+3. Ändert die ***Code-Chunk-Einstellungen*** der Code-Chunks, die Euren Barplot und Scatterplot erzeugt haben, so, dass:
+    + der Code gedruckt wird
+    + die Diagramme `Label` und `Caption` haben
+5. Bezieht euch auf den Balkenplot, den ihr im Text mit `@` erstellt habt. Wenn ihr das Dokument rendert, steht da dann 'Abbildung 1'?
+
+Du hast keinen Bericht erstellt? Dann kopiere einfach den Code aus den auf Moodle geteilten Lösungen.
+
+# Heutige Ziele 🏁 {.unnumbered .unlisted}
+
+Heute haben wir...
+
+- lernen, wie man Code Chunk Optionen verwendet ✅
+- lernen, wie man die Größe von Abbildungen kontrolliert ✅
+- lernen, wie man Bildunterschriften hinzufügt ✅
+- lernen, wie man formatierte Tabellen druckt ✅
+- lernen, wie man Querverweise erstellt ✅
+
+# Session Info {.unnumbered}
+
+```{r}
+#| label: RStudio-version
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+```
+
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.3.0.386 (Cherry Blossom).
+
+```{r}
+#| label: sessionInfo
+sessionInfo()
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

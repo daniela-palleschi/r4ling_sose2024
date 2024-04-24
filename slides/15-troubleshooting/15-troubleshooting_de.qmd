@@ -1,0 +1,382 @@
+---
+title: "Troubleshooting"
+subtitle: "Was tun, wenn etwas schief geht?"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 16 - Troubleshooting" 
+lang: de
+date: "`r Sys.Date()`"
+format: 
+  html:
+    output-file: troubleshooting_blatt_DE.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+    execute:
+      fig-width: 6
+      fig-asp: .618
+      fig-align: centre
+  revealjs: 
+    output-file: troubleshooting_folien_DE.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    toc: false
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+    execute:
+      fig-width: 6
+      fig-asp: .618
+      fig-align: centre
+  pdf:
+    toc: true
+    toc-depth: 1
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+    execute:
+      out-width: "80%"
+      fig-asp: .618
+      fig-align: centre
+bibliography: ../../references.bib
+csl: ../../apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, ## evaluate chunks
+                      echo = T, ## 'print code chunk?'
+                      message = F, ## 'print messages (e.g., warnings)?'
+                      error = T, ## continueeven when error encountered
+                      warning = F) ## don't print warnings
+```
+
+# Lernziele {.unnumbered}
+
+In diesem Abschnitt werden wir lernen
+
+- wie man mit allgemeinen Warnungen und Fehlermeldungen umgeht
+- wie man Fehler beim Rendern von Quarto-Skripten behebt
+- wo man Hilfe findet, wenn man mit fehlerhaftem Code nicht weiterkommt
+
+
+# Einrichten
+
+```{r}
+#| output-location: fragment
+p_load(tidyverse,
+       janitor,
+       here)
+```
+
+## Paket angeben
+
+- wir müssen angeben, dass sie aus dem Paket `pacman` stammt
+  + oder wir könnten dieser Zeile `library(pacman)` voranstellen
+
+```{r}
+#| echo: true
+pacman::p_load(tidyverse,
+               janitor,
+               here,
+               languageR)
+```
+
+# Fehlermeldungen
+
+- Fehler- oder Warnmeldungen sind bei der Programmierung im Allgemeinen sehr häufig
+  + auch erfahrene Programmierer machen oft die gleichen Fehler wie Sie
++ Mit zunehmender Erfahrung werden Sie lernen, Codefehler effizienter zu erkennen und zu beheben
+
+```{r}
+#| label: fig-error
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+knitr::include_graphics(here("media", "Horst_error.png"))
+```
+
+## Syntaxfehler
+
+- Syntaxfehler beziehen sich auf Fehler aufgrund von ungültigem Code
+  + am häufigsten fehlende Komma oder Klammer
+  + Tippfehler bei Funktions-, Objekt- oder Variablennamen
+
+### fehlende Zeichensetzung 
+
+- was ist das Problem mit diesem Code?
+
+```{r}
+#| output-location: fragment
+lexdec[c("Subject", "RT", "Correct"]
+```
+
+### Typfehler
+
+- was ist das Problem mit diesem Code?
+
+```{r}
+#| output-location: fragment
+lexdec[c("Subject", "rt", "Correct")]
+```
+
+### Tidyverse-Meldungen
+
+- das Tidyverse hat normaleweise sehr informative Meldungen
+
+```{r}
+#| output-location: fragment
+lexdec |> 
+  select("Subjct", "RT", "Correct")
+```
+
+- Hier wird uns genau gesagt, wo das Problem liegt: Wir haben keine Variable namens `Subjct`
+
+```{r}
+#| output-location: fragment
+lexdec |> 
+  select("subject", "RT", "Correct")
+```
+
+- Dieses Mal ist der Tippfehler auf die Groß- und Kleinschreibung zurückzuführen, denn unsere Variable `Subjekt` beginnt mit einem großen `S`
+
+### häufige Syntaxfehler
+
+Einige häufige Syntaxfehler sind:
+
+  - falsche Großschreibung (z.B. `Lexdec$Subject` statt `lexdec$Subject`)
+  - Tippfehler (z. B. `Länge(lexdec)` statt `Länge(lexdec)`)
+  - schließende Interpunktion, wie z. B. ein schließendes Anführungszeichen, eine Klammer oder eine eckige Klammer
+  - fortgesetzte Interpunktion, typischerweise fehlt ein Komma oder eine Pipe
+  
+```{r}
+#| label: fig-typo
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+#| eval: true
+knitr::include_graphics(here("media", "Horst_typo.png"))
+```
+
+## RStudio-Syntax-Checker
+
+- RStudio erkennt in der Regel Syntaxfehler und teilt Ihnen vor der Ausführung Ihres Codes mit, ob Sie etwas übersehen haben. Das folgende Code-Stück gibt zum Beispiel eine Fehlermeldung aus.
+
+```{r}
+#| output-location: fragment
+lexdec[c("Subject", "RT" "Correct")]
+```
+
+- Wir sehen ein rotes "X" neben der Zeilennummer (`42`) sowie eine rote Unterstreichung für den problematischen oder unerwarteten Code. 
+
+```{r}
+#| label: fig-rstudio
+#| fig-cap: RStudio-Syntaxfehler-Warnung
+#| out-width: "80%"
+#| echo: false
+knitr::include_graphics(here("media", "rstudio_error.png"))
+```
+
+## {.uncounted .unlisted .unnumbered}
+
+```{r}
+#| label: fig-troubleshooting
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+knitr::include_graphics(here("media", "Horst_troubleshooting.jpeg"))
+```
+
+# Rendering-Fehler
+
+- manchmal scheint unser Code gut zu laufen, aber wenn wir ein Quarto-Skript rendern, erhalten wir einen Fehler
+
+```{r}
+#| label: fig-render
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+#| out-width: "90%"
+knitr::include_graphics(here("media", "render_error.png"))
+```
+
+## `eval: false`
+
+- Der erste Codeabschnitt in @fig-render enthält die Option `eval: false`, und wird daher beim Rendern des Skripts nicht ausgeführt
+- Der zweite Codeabschnitt versucht dann, die ersten 6 Zeilen des Datensatzes `lexdec` zu drucken, der Teil des Pakets `languageR` ist
+- daher wird das `Objekt 'lexdec' nicht gefunden`.
+- Dies ist insofern informativ: es sagt uns nicht explizit, dass es daran liegt, dass wir das Paket nicht geladen haben
+  + Bei solchen Fehlern müssen wir manchmal nachforschen, indem wir unseren Code untersuchen.
+
+## Code-Zeilen und Chunk-Nummern
+
+- vielleicht haben wir ein sehr langes Skript geschrieben und es ist nicht klar, wo die Quelle des Problems liegt, wenn wir nur den Fehlertext betrachten
+  + wir erhalten auch Informationen darüber, *wo* Quarto auf ein Problem gestoßen ist: `Qutting from lines 11-12 [unnamed-chunk-2] (Untitled.qmd)`
+
+## RProjects
+
+
+```{r}
+#| label: fig-no-rproj
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+#| out-width: "70%"
+knitr::include_graphics(here("media", "load_no_rproject.png"))
+```
+
+## RProjects {.unlisted .unnumbered}
+
+- @fig-no-rproj: `"Users/danielapalleschi/daten/langaugeR_english.csv" existiert nicht`
+  + Diese Aussage ist richtig, da dieser Dateipfad auf meinem Rechner tatsächlich nicht existiert
+- Beachten Sie, dass oben in der Mitte des Bildes "RStudio" steht und rechts daneben "Project: (None)"
+  + wir arbeiten nicht innerhalb eines RProjekts
+
+
+## RProjects {.unlisted .unnumbered}
+
+- das gleiche Skript wird ohne Warnung ausgeführt, und Sie können sehen, dass wir innerhalb eines RProjekts mit dem Namen `r4ling` arbeiten
+  + und die csv-Datei wird ohne Warnung geladen
+
+```{r}
+#| label: fig-rproj
+#| fig-cap: Kunstwerke von Alison Horst
+#| echo: false
+#| out-width: "70%"
+knitr::include_graphics(here("media", "load_rproject.png"))
+```
+
+# Um Hilfe bitten
+
+- für manche Probleme ist es schwierig, eine Lösung zu finden
+- glücklicherweise gibt es eine sehr aktive R-Gemeinschaft im Internet
+- wir werden uns hier die häufigsten und hilfreichsten ansehen
+
+## Google
+
+- Im Zweifelsfall: Google! 
+  - Möglicherweise finden Sie einige Blogbeiträge oder Forenbeiträge, in denen das Problem und mögliche Lösungen diskutiert werden
+- Dies ist ein guter erster Schritt, um das Problem zu lösen.
+
+## Stackoverflow
+
+- eine Online-Community für Entwickler mit vielen Forenbeiträgen zu R-Programmierproblemen
+- In der Regel finden Sie einen Thread, in dem jemand das gleiche Problem hatte wie Sie, und mehrere andere antworten mit möglichen Lösungen
+- Wenn Sie wirklich nicht weiterkommen, können Sie sogar Ihre eigene Frage stellen! Dazu müssen Sie ein Konto erstellen
+
+## Dokumentation
+
+- es gibt eine Fülle von Dokumentationen für Pakete (und Funktionen)
+- in der Console: `?Paket` oder `?Funktion`
+
+## ChatGPT
+
+> Chatbots work best for small, discrete programming tasks, such as loading data, performing basic data manipulations and creating visualizations and websites.
+>
+> --- @perkel_six_2023
+
+- Wenn Sie ChatGPT Ihre Fehlermeldung oder sogar den problematischen Code geben, können Sie eine schnelle Erklärung des Problems und eine Lösung finden
+  + Dies kann ein wertvolles Lernmittel sein
+
+### ChatGPT: Vorsicht
+
+- ChatGPT wird Ihnen zum Beispiel nicht sagen können, dass Sie einen Variablennamen mit Kamelhülsen geschrieben haben (`cameCaseLooksLikeThis`), wenn Ihre Variablen mit Schlangenhülsen benannt sind (`snake_case_looks_like_this`)
+  + oder wenn es einen anderen Tippfehler gibt, der nichts mit der Syntax zu tun hat
+- Wenn Sie in der Lage sind, Fehler-/Warnmeldungen zu interpretieren und die Ursache des Problems ausfindig zu machen, ist das der schnellste Weg zur Lösung.
+
+### {.unlisted .uncounted .unnumbered}
+
+::: {.content-visible when-format="html"}
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">The temptation to copy and paste code snippets from ChatGPT or Stackoverflow is real, but true mastery lies in comprehension. <br><br>I&#39;ve copied and pasted a lot of code. But as a programmer, it&#39;s your duty to understand. <br><br>And to do so, you&#39;ll eventually end up in documentation 😉. <a href="https://t.co/HWi09tPz6O">pic.twitter.com/HWi09tPz6O</a></p>&mdash; Travis Oliphant (@teoliphant) <a href="https://twitter.com/teoliphant/status/1715356699203076143?ref_src=twsrc%5Etfw">October 20, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r}
+#| echo: false
+#| label: fig-twitter-white
+#| fig-cap: Ein Tweet über die Vorteile und Kosten der Verwendung von ChatGPT zur Korrektur von fehlerhaftem Code [Klicken Sie hier, um den Tweet zu sehen.](https://x.com/teoliphant/status/1715356699203076143?s=20)
+#| out-width: "70%"
+knitr::include_graphics(
+  here::here("media", "twitter_chatgpt.png")
+)  
+```
+:::
+
+### ChatGPT: Vertrauen, aber überprüfen
+
+- es ist wichtig zu wissen, dass ChatGPT ein Tausendsassa ist, der nichts beherrscht
+- "Vertrauen, aber überprüfen" [@perkel_six_2023]
+  + Vertrauen Sie nicht blind auf das, was die KI Ihnen sagt
+- Seien Sie also skeptisch gegenüber den Lösungen, die ChatGPT Ihnen anbietet, vor allem, wenn Ihre Probleme komplexer werden
+- Testen Sie immer, ob der vorgeschlagene Code nicht nur ohne eine weitere Warnung oder Fehlermeldung läuft, sondern ob er auch das erreicht, was Sie erwarten
+
+###
+
+::: {.callout-warning}
+
+# Disclaimer {.unlisted .uncounted .unnumbered}
+
+- ChatGPT und Datenschutz: Alles, was Sie in ChatGPT eingeben, wird an die Server von OpenAI gesendet und kann für Trainingszwecke verwendet werden. Geben Sie niemals sensible Informationen in ChatGPT ein.
+
+- ChatGPT und akademische Integrität: Schauen Sie sich unbedingt die [Empfehlungen für das Umgehen mit Künstlicher Intelligenz in Prüfungen](https://www.hu-berlin.de/de/pr/nachrichten/september-2023/hu_empfehlungen_ki-in-pruefungen_20230905.pdf) der Humboldt-Universität an
+
+- Aktualität: Darüber hinaus werden LLM (Large Language Models) auf Daten trainiert, die aktuell sein können oder auch nicht
+  + zum Beispiel wird ChatGPT vielleicht nicht auf der neuesten Version eines Pakets trainiert und ist sich daher möglicherweise der Probleme mit einem veralteten Argument nicht bewusst
+ 
+- Ethik der KI: weiteres, allgemeineres Problem bei der Verwendung von ChatGPT oder einem anderen LMM (Large Language Model)
+  + is es ethisch vertretbar, sich zu sehr auf künstliche Intelligenz zu verlassen, bei der wiederholt festgestellt wurde, dass sie rassische und geschlechtsspezifische Vorurteile hat?
+
+:::
+
+# Lernziele 🏁 {.unnumbered .unlisted}
+
+In diesem Kapitel haben wir gelernt...
+
+- wie man mit allgemeinen Warnungen und Fehlermeldungen umgeht ✅
+- wie man Fehler beim Rendern von Quarto-Skripten behebt ✅
+- wo man Hilfe findet, wenn man mit fehlerhaftem Code nicht weiterkommt ✅
+
+# Session Info {.unnumbered}
+
+```{r}
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+```
+
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.9.0.463 (Desert Sunflower).
+
+```{r}
+print(sessionInfo(),locale = F)
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+[Abschnitt 3.6 "Troublshooting Error Messages"](https://bookdown.org/yih_huynh/Guide-to-R-Book/trouble.html) aus dem Webbuch [R for Graduate Students](https://bookdown.org/yih_huynh/Guide-to-R-Book/) von Wendy Huynh (2019)
+
+::: {#refs custom-style="Bibliography"}
+:::

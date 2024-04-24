@@ -1,0 +1,503 @@
+---
+title: "Datenvisualisierung 4"
+subtitle: "Multi-part plots and customisations"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 12 - Datenvisualisierung 4" 
+lang: de
+date: "`r Sys.Date()`"
+format: 
+  html:
+    output-file: data_viz4_blatt_EN.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+    execute:
+      fig-width: 6
+      fig-asp: .618
+      fig-align: centre
+  revealjs: 
+    output-file: data_viz4_folien_EN.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: false
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    # slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+    execute:
+      fig-width: 6
+      fig-asp: .618
+      fig-align: centre
+  pdf:
+    toc: true
+    toc-depth: 1
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+    execute:
+      out-width: "80%"
+      fig-asp: .618
+      fig-align: centre
+bibliography: ../../references.bib
+csl: ../../apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, ## evaluate chunks
+                      echo = T, ## 'print code chunk?'
+                      message = F, ## 'print messages (e.g., warnings)?'
+                      error = T, ## continueeven when error encountered
+                      warning = F) ## don't print warnings
+```
+
+# Lesungen {.unnumbered}
+
+For further reading and practice on this topic, I suggest reading [Section 11.5 (Communication: Themes)](https://r4ds.hadley.nz/communication#sec-themes) in @wickham_r_2023, and [Chapter 4 (Representing summary statistics)](https://psyteachr.github.io/introdataviz/representing-summary-statistics.html) in @nordmann_data_2022.
+
+# Learning objectives {.unnumbered}
+
+In this section we will learn to
+
+- build multi-part plots
+- adjust the position of geoms
+- customise our plots for better data communicate
+
+# Set-up {.unnumbered}
+
+## Packages {.unnumbered}
+
+Today, we're loading our relevant `tidyverse` packages directly: `dplyr` and `ggplot`. These are the only  To aid us in loading in our data, we're also loading the `here` package, and the `janitor` package which is useful for tidying up our data (e.g., the `clean_names()` function). To customise our plots we're also using the `ggthemes` and `patchwork` packages. The former helps us produce plots that are colour-blind friendly, while the latter allows us to print multiple plots together. We also need a new package: `gghalves`.
+
+```{r}
+pacman::p_load(tidyverse,
+               here,
+               janitor,
+               ggthemes,
+               patchwork,
+               gghalves
+               )
+```
+
+```{r}
+#| echo: false
+# load magick for the slides
+pacman::p_load(magick)
+```
+
+## Data {.unnumbered}
+
+We're again working with our slightly altered version of the `english` dataset from the `languageR` package.
+
+```{r}
+df_eng <- read_csv(
+  here(
+    "daten",
+    "languageR_english.csv"
+  )
+) |> 
+  clean_names() |> 
+  rename(
+    rt_lexdec = r_tlexdec,
+    rt_naming = r_tnaming
+  )
+```
+
+# Dodged density plots
+
+We can produce density plots mapped along a catgorical variable by using `geom_half_violin()` from the `gghalves` package. 
+
+```{r}
+#| label: fig-density
+#| fig-cap: "Dodged density plots with `gghalves::geom_half_violin()`"
+#| output-location: column-fragment
+df_eng %>% 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_half_violin(alpha = .8)
+```
+
+## Adding a boxplot
+
+We can also add another geom to add more information to the plot. Let's add a boxplot.
+
+```{r}
+#| label: fig-boxplot
+#| fig-cap: "Boxplot on top of our dodged density plot"
+#| output-location: column-fragment
+df_eng %>% 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_half_violin(alpha = .8) +
+  geom_boxplot()
+```
+
+
+## `position_nudge()`
+
+Maybe we want to move the boxplot so that it's not overtop of the density plots, and so that it's not quite as wide. We can do this by setting `position` to `position_nudge()`, and `width` to some value smaller than `.75`, which is the default width.
+
+```{r}
+#| label: fig-boxplot-nudge
+#| fig-cap: "Boxplot on top of our dodged density plot"
+#| output-location: column-fragment
+df_eng %>% 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_half_violin(alpha = .8) +
+  geom_boxplot(width = .3, # make less wide
+               position = position_nudge(x=0.2)
+               )
+```
+
+## `position_jitter()` for scatterplots
+
+This is from a family of options that allow us to alter the position of geoms. For example, @fig-jitter A and B both show the exact same data, but @fig-jitter B includes `position = position_jitter(0.2)` to move overlapping points. This way we get a good idea of how many observations there were across reaction times (y-axis).
+
+```{r}
+#| code-fold: true
+#| label: fig-jitter
+#| fig-cap: "Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
+#| fig-width: 10
+df_eng |> 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_point() +
+  labs(title = "geom_point()") +
+df_eng |> 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_point(position = position_jitter(0.2),
+             alpha = 0.2)+
+  labs(title = "geom_point(position = position_jitter(0.2))") +
+  
+  plot_annotation(tag_levels = "A")
+```
+
+## Combining all three
+
+If we put all of these plots together, we get a @fig-violin1. 
+
+```{r}
+#| code-fold: true
+
+fig_no_colour <-
+  df_eng %>% 
+  ggplot() +
+  aes(x = age_subject, y = rt_lexdec) +
+  geom_point(position = position_jitter(0.2),
+             alpha = 0.2) +
+  geom_half_violin() +
+  geom_boxplot(
+    outlier.shape = NA,
+               width = .3, 
+               position = position_nudge(x=0.2)) 
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-violin1
+#| fig-cap: "Density, boxplot, scatterplot"
+#| output-location: column-fragment
+#| code-line-numbers: "3"
+#| fig-width: 6
+#| fig-asp: .6
+fig_no_colour 
+```
+
+# Positioning errorbar plots
+
+In the second report, you produced errorbar plots, but the errorbars were overlapping. 
+
+```{r}
+#| echo: false
+#| label: fig-bericht2
+#| fig-cap: Overlapping errorbars
+df_eng |> 
+  pivot_longer(
+    cols = c(rt_lexdec, rt_naming),
+    names_to = "task",
+    values_to = "rt"
+  ) |> 
+  summarise(
+    mean = mean(rt, na.rm = T),
+    sd = sd(rt, na.rm = T),
+    .by = c(age_subject, task)
+  ) |> 
+  mutate(age_subject = factor(age_subject, levels = c("young", "old"))) |> ggplot() +
+  aes(x = age_subject, y = mean, colour = task, shape = task) +
+  geom_point() +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))
+```
+
+
+## `pivot_longer() |> summarise()`
+
+Let's reproduce something similar using the `english` dataset. First, we'll use `pivot_longer()` to lengthen our data, then we'll create a summary of reaction times for the lexical decision task and naming task per age group.
+
+```{r}
+sum_eng <-
+  df_eng |> 
+  pivot_longer(
+    cols = c(rt_lexdec, rt_naming),
+    names_to = "task",
+    values_to = "rt"
+  ) |> 
+  summarise(
+    mean = mean(rt, na.rm = T),
+    sd = sd(rt, na.rm = T),
+    .by = c(age_subject, task)
+  ) |> 
+  mutate(age_subject = factor(age_subject, levels = c("young", "old"))) 
+```
+
+## Overlapping errorbars
+
+If we create an errorbar plot of this data, we get @fig-overlap.
+
+```{r}
+#| label: fig-overlap
+#| fig-cap: Overlapping errorbar plot
+sum_eng |> 
+  ggplot() +
+  aes(x = age_subject, y = mean, colour = task, shape = task) +
+  geom_point() +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))
+```
+
+## `position_dodge()` 
+
+We can add `position = position_dodge(0.2)` to force the errorbars to not overlap. We'll also adjust their `width` so they're not so wide (any value lower than 0.75).
+
+```{r}
+#| label: fig-miss-points
+#| fig-cap: Overlapping errorbar plot
+sum_eng |> 
+  ggplot() +
+  aes(x = age_subject, y = mean, colour = task, shape = task) +
+  geom_point() +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),
+                position = position_dodge(0.2),
+                width = 0.2)
+```
+
+## dodging all relevant geoms
+
+But now we've left the points behind. We need to also dodge the points, so we add `position_dodge()` to `geom_point()`, making sure to use the same value as we did with `geom_errorbar()`.
+
+```{r}
+#| label: fig-dodged
+#| fig-cap: Overlapping errorbar plot
+sum_eng |> 
+  ggplot() +
+  aes(x = age_subject, y = mean, colour = task, shape = task) +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),
+                position = position_dodge(0.2),
+                width = 0.2)
+```
+
+# Customisations
+
+What customisations do you see in the plots in @fig-custom?
+
+```{r}
+#| code-fold: true
+
+fig_dens_colour <-
+  df_eng %>% 
+  ggplot(aes(x = age_subject, y = rt_lexdec, )) +
+  geom_point(
+    color = "grey",
+    position = position_jitter(0.2),
+                 alpha = 0.2) +
+  geom_half_violin(
+    aes(fill = age_subject)) +
+  geom_boxplot(
+    outlier.shape = NA,
+    aes(color = age_subject),
+               width = .3, 
+               position = position_nudge(x=0.2)) +
+  labs(title = "Distribution of reaction times",
+       x = "Age group",
+       y = "LDT reaction time (ms)",
+    fill = "Age group") +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+fig_point_colour <-
+  df_eng %>% 
+  ggplot(aes(x = age_subject, y = rt_lexdec, )) +
+  geom_point(
+    aes(color = age_subject),
+    position = position_jitter(0.2),
+                 alpha = 0.2) +
+  geom_half_violin() +
+  geom_boxplot(
+    outlier.shape = NA,
+    # aes(color = age_subject),
+               width = .3, 
+               position = position_nudge(x=0.2)) +
+  labs(title = "Distribution of reaction times",
+       x = "Age group",
+       y = "LDT reaction time (ms)",
+    fill = "Age group") +
+  scale_color_colorblind() +
+  scale_fill_colorblind() +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+fig_default <-
+  sum_eng %>% 
+  ggplot(aes(x = age_subject, y = mean, 
+             colour = task, shape = task)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd)) 
+
+fig_custom <-
+sum_eng %>%
+  mutate(task = fct_recode(task,
+                           "LDT" = "rt_lexdec",
+                           "Naming" = "rt_naming"),
+  age_subject = fct_recode(age_subject,
+                           "Young" = "young",
+                           "Old" = "old")) |> 
+  ggplot(aes(x = age_subject, y = mean, 
+             colour = task, shape = task)) +
+  geom_point(position = position_dodge(0.3),
+             size = 3) +
+  geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),
+                position = position_dodge(0.3), 
+                width = .3) +
+  geom_line(aes(group = task,
+                linetype = task),
+                position = position_dodge(0.3)) +
+  theme_minimal() +
+  labs(
+    title = "Reaction times per group and task",
+    x = "Age group",
+    y = "Reaction time (ms)",
+    colour = "Task",
+    shape = "Task",
+    linetype = "Task"
+  ) +
+  theme(axis.title = element_text(size = 12,
+                                  face = "bold"),
+        plot.title = element_text(size = 14),
+        legend.title = element_text(face = "bold"))
+```
+
+```{r}
+#| output-location: fragment
+#| label: fig-custom
+#| fig-cap: Customised plots to facilitation data communication.
+#| echo: false
+#| fig-width: 12
+fig_custom + fig_dens_colour + fig_point_colour +
+  plot_annotation(tag_levels = "A")
+```
+
+## Default themes
+
+Firstly, `theme_minimal()` was added to each plot to customise the general look. There are a variety of custom themes to try, like `theme_bw()` or `theme_classic()`. Try them out.
+
+```{r}
+#| output-location: fragment
+#| label: fig-themes
+#| fig-cap: Preset themes
+#| echo: false
+#| fig-width: 12
+#| fig-height: 3
+
+  (fig_custom + theme_grey() +labs(title = "theme_grey() (default theme)"))  + 
+  (fig_custom + theme_bw() +labs(title = "theme_bw()")) +
+  (fig_custom + theme_minimal() +labs(title = "theme_minimal()")) + 
+  (fig_custom + theme_classic() +labs(title = "theme_classic()")) +
+  plot_layout(nrow = 1)
+  
+```
+
+## theme()
+
+We can also control individual components of theme by adding customisations with `theme()`. For example we see in @fig-custom A the axis titles are bolded. This was achieved by adding `theme(axis.title = element_text(face = "bold))`, where `axis.title =` indicates we want to make a change to the axis titles, `element_text()` indicates it's their text that we want to change, and `face = "bold"` indicates we want to make the text bold. The same was done for `legend.title =` to make the legend title bold. 
+
+```{r}
+#| output-location: fragment
+#| label: fig-italics
+#| fig-cap: Using theme()
+
+fig_no_colour + theme_minimal() + 
+  theme(
+    axis.title = element_text(face = "italic")
+    )
+```
+
+
+# Heutige Ziele 🏁 {.unnumbered .unlisted}
+
+Heute haben wir gelernt, wie man...
+
+- build multi-part plots ✅
+- adjust the position of geoms ✅
+- customise our plots for better data communicate ✅
+
+# Aufgaben
+
+1. Multi-part plot. Produce @fig-dodged and @fig-violin1 for `rt_naming` (instead of `rt_lexdec`). Print the plots side-by-side using `patchwork`.
+
+2. Labels. Use `labs()` to add labels for the title, x- and y-axes, and for any aesthetics you used (shape, colour, etc.) that result in a legend. This should end with your legend title also having a custom name.
+
+2. Customisations. Add customisations to the two plots by choosing a default theme, followed by `theme()` with adjustments for the axis titles, legend title, and plot title. You can change `face`, `size`, `family` (i.e., font). You can type `?theme` in the Console or try Googling to get some ideas. If you aren't feeling creative, just try to replicate one of the customisations you see in @fig-custom
+
+# Session Info {.unnumbered}
+
+```{r}
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+```
+
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.3.0.386 (Cherry Blossom).
+
+```{r}
+print(sessionInfo(),locale = F)
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

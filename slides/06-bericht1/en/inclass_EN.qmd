@@ -1,0 +1,448 @@
+---
+title: "Summary assignment: wrangling and data viz"
+subtitle: "In-class assignment 1"
+author: "YOUR NAME HERE"
+institute: Humboldt-Universität zu Berlin
+lang: de
+date: "`r Sys.Date()`"
+format:
+  html:
+    output-file: report1_LASTNAME-FIRSTNAME.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    code-overflow: wrap
+    # code-tools: true
+    self-contained: true
+  pdf:
+    output-file: report1_LASTNAME-FIRSTNAME.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+bibliography: references.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, eval=TRUE, echo = FALSE}
+# set this to TRUE if you want to provide the results/answers; then also add 'code-tools: true' to the YAML
+# set this to FALSE if this is the version to be sent describing the assignment
+
+options(scipen=999)
+
+ANSWERS_MODE <- "instructions" # instructions only
+# ANSWERS_MODE <- "output" # output only but not the code
+# ANSWERS_MODE <- "answers" # code and output
+```
+
+```{r, eval = if (ANSWERS_MODE == 'instructions') TRUE else FALSE, echo = FALSE}
+
+knitr::opts_chunk$set(eval = F, # evaluate chunks
+                      echo = F, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = if (ANSWERS_MODE == 'output') TRUE else FALSE, echo = FALSE}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = F, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = if (ANSWERS_MODE == 'answers') TRUE else FALSE, echo= if (ANSWERS_MODE == 'answers') TRUE else FALSE}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+#| results: hide
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("inclass.qmd")
+```
+
+# Intended learning outcomes {.unnumbered .unlisted}
+
+- the intended aim of this report is for you to demonstrate...
+
+### Knowledge and skills {.unnumbered .unlisted}
+
+- the ability to use R for data wrangling and visualistion
+- the ability to use Quarto and RStudio for reproducible reports
+
+### Communication {.unnumbered .unlisted}
+
+- the ability to produce a clearly structured and coherent report
+
+# Evaluation {.unnumbered .unlisted}
+
+You will be evaluated based on the replication of 
+
+- the structure of the document (the HTML output)
+- the structure and accuracy of the code (`.qmd` source code)
+- the similarity between the original plots and your plots
+
+# Processing of temporal agreement
+
+We will be looking at linguistic data for the first time. Our measure variables (i.e., dependent variables) are eye-tracking reading times (specifically, *total reading time*), reaction times, and accuracies. Our predictor variables (i.e., independent variables) are time reference (past or future) and verb tense (past or future). You do not need to fully understand the data to complete the tasks, but you may find it helpful.
+
+Our data comes from @biondo_yesterday_2022, which included two tasks:
+
+1. an eye-tracking reading experiment
+    + participants read (Spanish) sentences with past or future temporal phrases (e.g., *ayer* 'yesterday' or *mañana* 'tomorrow') and past or future verb tense (e.g., *compraron* 'bought' or *comprarán* 'will buy').
+    + eye movements were recorded while participants read the sentences
+    + the main hypothesis: when temporal phrases mismatched verb tense (e.g., 'yesterday...will buy' or 'tomorrow...bought'), *longer* reading measures should be observed at the verb region
+    + another question: is this effect observed for both the past and future?
+2. a verb 'temporal decision task'
+    + in a separate session (i.e., not during the eye-tracking experiment), participants were presented a verb in isolation and were asked to decide if the verb was in the past or future tense
+    + accuracy and reaction time were recorded
+    + main research question: how does the assessment of temporal reference compare between present and future tensed verbs identified? In other words, is one identified faster than the other?
+
+We typically consider longer reaction times and/or reading times (like total reading time) to reflect *processing difficulties*, i.e., difficulties processing language. The hypothesis was therefore that longer total reading times would be present for the *verb* region in ungrammatical sentences. For the reaction times, the question is whether the verb tenses (past/future) elicit similar reaction times in a categorisation task, or whether one tense takes longer to categorise as the other.
+
+Your main task is to re-create four plots exploring the data.
+
+# Set-up
+
+## YAML
+
+- create a new Quarto document
+- make sure your YAML includes:
+  + an appropriate title
+  + your first and last name (`author`)
+  + the date
+  + table of contents
+  + under `format: html`..., include `self-contained: true`
+  
+- your YAML should look something like this
+
+```{r}
+#| eval: false
+#| echo: true
+#| code-line-numbers: false
+---
+title: "Summary assignment: wrangling and data viz"
+subtitle: "In-class assignment 1"
+author: "YOUR NAME HERE"
+institute: Humboldt-Universität zu Berlin
+lang: de
+date: "`r Sys.Date()`"
+format:
+  html:
+    toc: true
+    number-sections: true
+    self-contained: true
+---
+```
+
+## Document structure
+
+- you will be handing in your Quarto script and the HTML output of your script
+- to make the rendered document more legible, remember to use headings and subheadings to structure the document
+- use written text where necessary to answer questions/describe processes
+- use code chunks where necessary
+
+- a good strategy for choosing a heading: where this document has a new section, it would be wise for you to also create a new section
+
+## Packages
+
+- you will need the packages:
+  - `tidyverse`
+  - `here`
+  - `patchwork`
+  - `ggthemes`
+  
+Load them using the `pacman` package (`p_load()` function).
+  
+```{r}
+#| eval: true
+pacman::p_load(tidyverse,
+               here,
+               ggthemes,
+               patchwork)
+```
+
+## Data description
+
+Download the following data and save it in the `daten` folder: `Biondo_etal_2021_TDT.csv`.
+
+```{r}
+#| eval: false
+
+df_resp <- read_csv(here("daten", "Biondo.Soilemezidi.Mancini_dataset_TDT.csv"),
+                    locale = readr::locale(encoding = "latin1")) %>%
+  rename(Item.num = item,
+         Tense_type = tense,
+         RT = rt) %>% 
+  relocate(Tense_type, .before = subj) %>% 
+  arrange(desc(RT))
+
+# take total time from verb region to join with the response data (so scatterplots are possible)
+df_et <- read_csv(here("daten", "Biondo.Soilemezidi.Mancini_dataset_ET.csv"),
+                    locale = readr::locale(encoding = "latin1")) %>% 
+  rename(subj = sj,
+         Item.num = item,
+         Tense_type = verb_t) %>% 
+  filter(ROI == "4") %>% 
+  mutate(subj = as.numeric(subj)) %>% 
+  select(subj,Item.num,label,tt, gramm)
+
+# join, based on subj and item
+df_both <- df_resp %>% 
+  left_join(df_et, join_by(subj,Item.num)) %>% 
+  select(-label) %>% 
+  rename(totalTime = tt)
+
+write.csv(df_both, here("daten", "Biondo_etal_2021_TDT.csv"), row.names = FALSE)
+```
+
+Our variables are:
+
+```{r}
+#| eval: true
+#| results: hide
+#| echo: false
+
+df_resp <- read_csv(here("daten", "Biondo_etal_2021_TDT.csv"),
+                    locale = readr::locale(encoding = "latin1"))
+
+# Create variable explanation
+coldesc <- rep("", ncol(df_resp))
+names(coldesc) <- names(df_resp)
+dput(coldesc)
+
+vars <-
+  c(
+    Tense_type = "Tense (past/future)",
+    subj = "Participant ID",
+    Item.num = "Item number",
+    verb = "verb",
+    acc = "accuracy (0 = wrong, 1 = correct)",
+    RT = "Reaction time (milliseconds)",
+    totalTime = "total reading time (milliseconds)",
+    gramm = "grammatical (0 = no, 1 = yes)"
+  )
+```
+
+```{r}
+#| echo: false
+#| eval: true
+x <- data.frame(vars)
+
+knitr::kable(vars,
+             col.names = "Description",
+             caption = "Variable names and descriptions for dataset `/Biondo_etal_2021_TDT.csv`") %>% 
+  kableExtra::kable_styling()
+```
+
+
+
+
+
+# Data exploration
+
+## Load the data
+
+1. To load the data, copy the code below. 
+
+```{r}
+#| eval: false
+#| echo: true
+df_resp <- read_csv(here("daten", "Biondo_etal_2021_TDT.csv"))
+```
+
+2. Add to the line of code above (using a pipe) so that you also:
+    + rename the variables:
+      + `Tense_type` as `tense`
+      + `Item.num` as `item`
+      + `RT` as `rt`
+      + `totalTime` as `tt`
+    + relocate `tense` to be before `verb`, and `gramm` to be after `verb`
+    + arrange the rows by `subj` and by `item`
+
+```{r}
+#| eval: true
+df_resp <- read_csv(here("daten", "Biondo_etal_2021_TDT.csv")) %>% 
+  rename(tense = Tense_type,
+         item = Item.num,
+         rt = RT,
+         tt = totalTime) %>% 
+  relocate(tense, .before = verb) %>% 
+  relocate(gramm, .after = verb) %>% 
+  arrange(subj, item)
+```
+
+Hint: the head of your data should look like this:
+
+```{r}
+#| eval: true
+#| echo: true
+head(df_resp)
+```
+
+## Explore the data
+
+2. Explore the dataset using the appropriate function(s). Only include what you feel to be the *best* summary in the report (i.e., you can play around with the data exploration, but only include what you think is a concise and informative summary).
+
+```{r}
+summary(df_resp)
+```
+
+```{r}
+glimpse(df_resp)
+```
+
+## Variables
+
+1. Make a bullet list of the variables, in which you indicate what *type* of variable each is (e.g., numerical, categorical, etc). Remember that numbers are not always numerical. Make the variable names italics.
+
+- *variable name*: variable type
+- ...
+
+2. Replicate the density plot (Plot A) and histograms (Plot B) as closely as you can. For the histogram, you will need to include the layer `facet_grid(.~as_factor(acc))` to your ggplot.
+
+```{r}
+#| eval: true
+fig_density <- df_resp %>% 
+  ggplot(aes(x = rt, fill = as_factor(acc), colour = as_factor(acc))) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Reaction times per accuracy level",
+       x = "Reaction times (ms)",
+       y = "Density",
+       fill = "Accuracy",
+       colour = "Accuracy") +
+  theme_minimal()
+```
+
+```{r}
+#| eval: true
+fig_histogram <- df_resp %>% 
+  ggplot(aes(x = rt, fill = as_factor(acc), colour = as_factor(acc))) +
+  facet_grid(.~as_factor(acc)) +
+  geom_histogram(alpha = 0.4) +
+  labs(title = "Reaction times per accuracy level",
+       x = "Reaction times (ms)",
+       y = "Count",
+       fill = "Accuracy",
+       colour = "Accuracy") +
+  theme_bw()
+```
+
+```{r}
+#| eval: true
+
+(fig_density / fig_histogram) +
+  plot_layout(nrow = 2,  heights = c(.4,.6)) +
+  plot_annotation(tag_levels = "A")
+```
+
+3. Describe the distribution of reaction times based on these plots. What would the approximate mode reaction times of accurate responses be? Of inaccurate responses? Are there more accurate or inaccurate responses?
+
+# Data Visualisation
+
+Replicate *and describe* the following plots.
+
+## Barplot
+
+1. Reproduce the plot below (accuracy by tense). We did not cover how to print the bars side-by-side. Tip: this is called a *grouped* barplot (EN: grouped barplot). You may need to Google "grouped barplot ggplot2" to find how to produce such a barplot.
+
+```{r}
+#| eval: true
+
+df_resp %>% 
+  ggplot(aes(x = as_factor(tense), fill = as_factor(acc))) +
+  # facet_grid(.~as_factor(tense)) +
+  geom_bar(position="dodge") +
+  labs(title = "Accuracy by tense",
+       x = "Tense",
+       y = "Count",
+       fill = "Accuracy",
+       colour = "Accuracy") +
+    scale_fill_colorblind() +
+  theme_bw() 
+```
+
+Describe the plot, e.g., did each tense receive more accurate or inaccurate responses? Were they similar between tenses?
+
+## Scatterplot
+
+2. Replicate this plot, and answer this question: Does there seem to be a trend between reaction times and total reading times? Describe what you see.
+
+```{r}
+#| eval: true
+#| 
+df_resp %>% 
+  ggplot(aes(x = tt, y = rt)) +
+  # facet_grid(.~as_factor(tense)) +
+  geom_point(position = position_jitterdodge(.5), alpha = .5,
+             aes(colour = tense, shape = tense)) +
+  labs(title = "Reaction time by total reading time at the verb region",
+       x = "Total reading time (ms)",
+       y = "Reaction time (ms)",
+       shape = "Tense",
+       colour = "Tense") +
+    scale_fill_colorblind() +
+  geom_smooth(method="lm") +
+  theme_bw() 
+```
+
+# Interpreting a new plot type
+
+An important skill is learning how to interpret data in a plot. Below is a boxplot (soemtimes called a box-and-whisker plot), which we have not seen before. Answer the following questions about the plot:
+
+1. What is plotted along the x-axis? Is this a numerical or categorical factor?
+2. What is plotted along the y-axis? Is this a numerical or categorical factor?
+3. Can you guess the name of the `geom` that produces a boxplot? Think about the name of a `geom` for a barplot, for example.
+4. What do you think the dots on the plot represent? (It's okay to be wrong.)
+5. What do you think the box on the plot represents? (It's okay to be wrong.)
+5. What do you think the thick line in the middle of the box represents? (It's okay to be wrong.)
+
+```{r}
+#| eval: true
+df_resp %>% 
+  ggplot(aes(x = as_factor(gramm), y = tt,
+             colour = as_factor(gramm))) +
+  facet_grid(.~as_factor(tense)) +
+  geom_boxplot() +
+  labs(title = "Total reading time (verb region) by tense and grammaticality",
+       y = "Total reading time (ms)",
+       x = "Grammaticality") +
+    scale_fill_colorblind() +
+  theme_bw() +
+  theme(legend.position = "none") 
+```
+
+
+
+# Submit your report
+
+Once you're finished, upload your `.qmd` script *and* the rendered HTML-format output to Moodle.
+
+# Session Info {.unnumbered}
+
+```{r}
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+```
+
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.3.0.386 (Cherry Blossom).
+
+```{r}
+sessionInfo()
+```
+
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
