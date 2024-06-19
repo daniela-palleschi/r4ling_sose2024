@@ -1,0 +1,580 @@
+---
+title: "Data import"
+subtitle: "Reading in data files"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 7 - Datenimport" 
+lang: en
+date: "11/29/2023"
+date-format: "ddd, MMM DD, YYYY"
+date-modified: last-modified
+format: 
+  html:
+    output-file: data_import_blatt.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+    embed-resources: true
+  revealjs: 
+    output-file: data_import_folien.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: data_import.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: ../../references.bib
+csl: ../../apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+## Readings {.unnumbered}
+
+- **required reading**: [Ch. 8 (data import)](https://r4ds.hadley.nz/data-import) in @wickham_r_2023
+
+- **supplementary reading**: [Ch. 4 (data import)](https://psyteachr.github.io/ads-v2/04-data.html) in @nordmann_applied_2022
+
+
+# Review {.unnumbered .unlisted}
+
+So far, we've learned how to...
+
+- use Quarto scripts for reproducible data analysis
+- load in built-in datasets
+- wrangle data with `dplyr` verbs
+- visualise distributions and relationships of different variable types
+
+# Learning objectives {.unnumbered .unlisted}
+
+Today we will learn how to:
+
+- create and store local data files (`.csv`)
+- import local data files with the `readr` package 
+- handle missing values
+- change variables to factors
+
+# Packages
+
+- we will start using the `pacman` package instead of `install.packages()` and `library`
+  + the function `p_load()` takes package names as arguments
+  + then checks if you have the package installed
+    + if you do --> loads the package (just like `library()`)
+    + if you don't --> the package is installed and then loaded (like using `install.packages()` + `library()`)
+- this saves us from having to install new packages individually
+
+---
+
+```{r}
+#| eval: false
+# install new packages IN THE CONSOLE!
+install.packages("pacman")
+```
+
+```{r}
+# load packages
+pacman::p_load(tidyverse, # wrangling
+               languageR, # linguistic datasets
+               janitor, # wrangling
+               here, # relative file paths
+               patchwork # plot layout
+               )
+```
+
+- we now have `tidyverse` loaded, and the new packages `janitor` and `here` installed and loaded
+  + to find out more about these packages, try typing `?janitor` and `?here` in the Console.
+
+# CSV: Comma separated value
+
+- there are many different file types that data can take, e.g., .xlsx, .txt, .csv, .tsv. 
+- `csv` is the most typical data file type, and stands for: Comma Separated Values.
+
+- this is what a simple CSV file looks like when viewed as raw text
+
+```{r}
+#| echo: false
+#| output-location: fragment
+#| message: false
+#| comment: ""
+
+read_lines(here::here("daten", "students.csv")) |> cat(sep = "\n")
+```
+
+- the first row (the "header row") contains the columns names
+- the subsequent rows contain the data
+- How many variables are there? how many observations?
+
+## Tidy data
+
+- you want your data to be *tidy*
+  - tidy data is rectangular, and:
+  - each column represents a variable
+  - each row an observation
+  - each cell a data point (@fig-tidy-data).
+
+::: {.content-visible when-format="html"}
+```{r eval = T, fig.env = "figure", out.width="100%",  fig.pos="H", set.cap.width=T, fig.cap="Source: @wickham_r_2023 (all rights reserved)"}
+#| echo: false
+#| label: fig-tidy-data
+
+library(magick)
+magick::image_read(here::here("media/Wickham_tidydata.png"))
+```
+:::
+
+
+::: {.content-visible when-format="pdf"}
+```{r eval = T, fig.env = "figure", out.width="75%",  fig.pos="H", set.cap.width=T, fig.cap="Source: @wickham_r_2023 (all rights reserved)"}
+#| echo: false
+#| label: fig-tidy-data-1
+
+library(magick)
+magick::image_read(here::here("media/Wickham_tidydata.png"))
+```
+:::
+
+::: {.content-visible when-format="revealjs"}
+# RProjects {.uncounted .unlisted}
+:::
+
+::: callout-tip
+## RProjects {.uncounted .unlisted}
+
+- make sure you're working in the class RProject!
+- if you aren't, follow the exercise on the course website [here](https://daniela-palleschi.github.io/r4ling/mats/07-dateneinlesung.html#rprojects)
+
+:::
+# Spreadsheet to csv
+
+- let's collect some toy data in a spreadsheet which we will then save as a CSV file and load into R
+  + [Click here](https://docs.google.com/spreadsheets/d/1nAKO3AGSTMmNibZLNZ4DD6okXyxxP8IDkj9PjpX0B5k/edit?usp=sharing) to go to an editable spreadsheet
+  + Enter the relevant information about yourself, or make up some data: the name of a pet you have/had, height, birth month and day, plus your first language. If you have no pet, leave the cell blank.
+
+
+::: {.content-visible when-format="html"}
+```{r eval = T, fig.env = "figure", out.width="100%",  fig.pos="H", set.cap.width=T, fig.cap="Our spreadsheet"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/spreadsheet_googlesheet.png"))
+```
+:::
+
+
+::: {.content-visible when-format="pdf"}
+```{r eval = T, fig.env = "figure", out.width="75%",  fig.pos="H", set.cap.width=T, fig.cap="Our spreadsheet"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/spreadsheet_googlesheet.png"))
+```
+:::
+
+### Save csv
+
+- save the spreadsheet as `groesse_geburtstag.csv` to your computer, directly in a folder called `daten` in our project directory
+
+::: {.content-visible when-format="revealjs"}
+### Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-table1]: `Saving a CSV`
+::: {#exm-table1 .custom}
+::: nonincremental
+1. Create a new folder called `daten` in your project folder (if you haven't already).
+1. Download the Google Sheet and save it in your `daten` folder as `groesse_geburtstag.csv`
+2. Go to your `daten` folder and check that the CSV file is there.
+
+:::
+:::
+:::
+
+# The `readr` package
+
+- we now have to *read in the data*
+- we have to use a function that reads CSV data, and to specify *where* the data is in our RProject folder
+
+- the `readr` package (part of `tidyverse`) can load in most data types, and has multiple functions for different data types
+
+---
+
+```{r}
+#| echo: true
+#| eval: false
+#| message: false
+
+read_csv(here::here("daten", "groesse_geburtstag.csv"))
+```
+
+```{r}
+#| label: tbl-students-table
+#| echo: false
+#| message: false
+#| tbl-cap: Data from the groesse_geburtstag.csv file as a table.
+
+read_csv(here::here("daten", "groesse_geburtstag.csv")) |>
+  knitr::kable()
+```
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-readr]: `readr`
+::: {#exm-readr .custom}
+::: nonincremental
+1.  Import the `groesse_geburtstag.csv` dataset and save it as an object called `df_groesse`
+    - `df_` is short for DataFrame; it's a good idea to use a prefix before object names so we know what each object contains
+2.  When importing data with `read_csv`, some information is printed in the Console. What is printed?
+2.  Explore the dataset using the functions like `summary()` or `head()`
+3.  Do you see anything odd?
+:::
+:::
+:::
+
+```{r}
+#| eval: false
+#| echo: false
+
+df_groesse <- read_csv(here("daten", "groesse_geburtstag.csv"))
+head(df_groesse) # missing data points
+```
+
+# The `here` package
+
+- how did R know exactly where to find the `daten` folder? 
+- our *working directory* is set to the location of our RProject within our computer
+  + whenever we want to access data in our RProject, we should nest our filepath in `here()`
+- to see where `here()` is starting from, run `here()`
+
+```{r}
+#| output-location: fragment
+here()
+```
+
+- the output will look different for all of our machines, because it's relative to where we placed our project folder
+
+---
+
+::: {.content-visible when-format="revealjs"}
+## `here` package {.unlisted .unnumbered}
+
+```{r echo = F, fig.env = "figure",out.width="70%", fig.align = "center", set.cap.width=T, fig.cap=" [Image source: Allison Horst](https://allisonhorst.com/other-r-fun) (all rights reserved)"}
+knitr::include_graphics(here::here("media", "Horst_here.png"))
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.env = "figure",out.width="90%", fig.align = "center", set.cap.width=T, fig.cap=" [Image source: Allison Horst](https://allisonhorst.com/other-r-fun) (all rights reserved)"}
+knitr::include_graphics(here::here("media", "Horst_here.png"))
+```
+:::
+
+# Working with data
+
+Data is chaotic, but with experience we can learn to tame it. Below you will find some tips that expand on what you have learned about data processing.
+
+## Missing values
+
+- you might've noticed some `NA` or `N/A` values
+  + `N/A` was written as text in one of our observations, and so R reads it as such
+  + `NA`s in R refer to missing data ("Not Available")
+  + true missing values are completely empty, so having `N/A` written in our `df_groesse` data is not actually read as a missing value
+  + to fix this, we can use the argument `na = ` for the `read_csv()` function, which tells `read_csv()` which values it should equate with missing values
+  
+::: {.content-visible when-format="revealjs"}
+## Missing values {.unlisted .unnumbered}
+:::
+
+```{r}
+#| output-location: fragment
+# force "N/A" to missing values
+df_groesse <- read_csv(here::here("daten", "groesse_geburtstag.csv"),
+                        na = "N/A")
+```
+
+```{r}
+# print the head of the data set
+head(df_groesse)
+```
+
+- the value that was formerly `""` is read as an `NA`
+- but what about the empty cell? We have now overwritten `read_csv()` reading empty cells as `NA`
+  + now we want to tell `read_csv()` to read *more than one* type of input as `NA`, i.e., we want to tell it to read `""` *and* `"N/A"` as `NA`
+  + for this, we use our always useful concatenate function: `c()`.
+
+::: {.content-visible when-format="revealjs"}
+## Missing values {.unlisted .unnumbered}
+:::
+
+```{r}
+#| output-location: fragment
+# force "N/A" and empty cells to missing values
+df_groesse <- read_csv(here::here("daten", "groesse_geburtstag.csv"),
+                        na = c("N/A",""))
+```
+
+
+```{r}
+# print the head of the data set
+head(df_groesse)
+```
+
+## Column names
+
+- one column name in our data is surrounded by backticks (e.g., `` `Monat der Geburt` ``)
+  + this is because it contains an empty space, which is not syntactically valid
+  + a quick fix is to the function `clean_names()` from the `janitor` package, which we've already loaded in
+  
+::: {.content-visible when-format="revealjs"}
+## Column names {.unlisted .unnumbered}
+:::
+
+```{r}
+clean_names(df_groesse)
+```
+
+- that looks better! But if you now run `head(df_groesse)`, do you see the cleaned column names?
+- you shouldn't because when we pass an object through a function, the object is not 'updated'
+  + so we have to again assign the object using the assignment operator `<-`
+
+```{r}
+#| code-fold: true
+df_groesse <- janitor::clean_names(df_groesse)
+```
+
+## Pipes
+
+- pipes are placed at the end of function call when the result of this function should be passed through a subsequent function. Pipes can be read as "and then...".
+
+```{r}
+read_csv(here::here("daten", "groesse_geburtstag.csv")) |>
+  head()
+```
+
+::: {.content-visible when-format="revealjs"}
+## Pipes {.unlisted .unnumbered}
+:::
+
+There are currently 2 pipes that can be used in R.
+
+  1. the `magrittr` package pipe: `%>%`
+  2. the new native R pipe: `|>`
+    
+- there aren't any major differences that are important for our current uses
+- you can use the keyboard shortcut `Cmd/Ctrl + Shift/Strg + M` to produce a pipe
+
+::: {.content-visible when-format="revealjs"}
+## Hausaufgaben {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-pipes]: pipes
+::: {#exm-pipes .custom}
+::: nonincremental
+1.    Load the `groesse_geburtstag.csv` dataset again with fixed `NA`s *and then*
+        + Use a pipe to call `clean_names()` on the dataset, *and then*
+        + call the `head()` function
+        + check the number of observations and variables, is there an issue?
+2.    Load the `groesse_geburtstag.csv` dataset again with fixed `NA`s, saving it as the object `df_groesse`, *and then*
+        + use a pipe to call `clean_names()` on the data set
+4.    Why shouldn't you use a pipe and the `head()` function when you're saving the dataset as an object?
+
+```{r}
+#| eval: false
+#| echo: false
+read_csv(here("daten", "groesse_geburtstag.csv"), na = c("","N/A")) |>
+  clean_names() |>
+  head()
+
+
+df_groesse <- read_csv(here("daten", "groesse_geburtstag.csv"), na = c("","N/A")) |>
+  clean_names()
+```
+
+:::
+:::
+:::
+
+## Other file types
+
+- `readr` has other functions which are also easy to use, you just have to know when to use which ones
+  
+- `read_csv2()` reads semicolon-separated csv files (`;`)
+  + this file type is common in countries that use `,` as the decimal marker (like Germany)
+
+- `read_tsv()` reads tab-delimited files
+- `read_delim()` function reads in files with any delimiter
+  + it will try to guess the delimiter unless you specify it with the argument `delim =` (e.g., `read_delim(groesse_geburtstag.csv, delim = ",")`)
+
+# Working with variables
+
+- the major columns types to know are `numerical` and `factor` (categorical)
+- factors contain *categories* or *groups* of data, but can sometimes *look* like `numerical` data
+  + for example, our column `month` contains numbers, but it could also contain the name of each month
+  + a good way to know which is which: it makes sense to calculate the mean of a `numerical` variable, but not of a `factor`
+  + for example, it makes sense to calculate our average height, but not our average birth month
+  
+## `as_factor()` {.unlisted .unnumbered}
+
+- we can use the `as_factor()` function to change a variable type to factor
+- We can either use base R syntax to do this by using an `$` to index a column in a dataframe:
+
+```{r}
+# mit base R
+df_groesse$monat_der_geburt <- as_factor(df_groesse$monat_der_geburt)
+```
+
+- or we can use `tidyverse` syntax and the `mutate()` function
+
+```{r}
+# mit tidyverse
+df_groesse <-
+  df_groesse |> 
+  mutate(monat_der_geburt = as_factor(monat_der_geburt))
+```
+
+# Learning objectives 🏁 {.unnumbered .unlisted}
+
+Today we learned how to...
+
+- import local data files with the `readr` package ✅
+- handle missing values ✅
+- change variables to factors ✅
+
+Let's now put this new knowledge to use.
+
+# Homework {.unnumbered}
+
+Let's now practice using the `readr` package and wrangling our data.
+
+## `readr` functions {.unnumbered}
+
+1.  What function would you use to read a file where fields were separated with “`|`”?
+2.  What arguments do `read_csv()` and `read_tsv()` have in common?
+3.  Which function(s) could you use to load in a dataset with a semicolon (`;`) as delimiter?
+
+## Data wrangling {.unnumbered}
+
+Re-load the `groesse_geburtstag.csv` file. Use pipes to also use the `clean_names` function, and to make the following changes in the object `df_groesse`:
+
+1. Convert the variable `l1` to a factor.
+2. Rename 
+    + `grosse` to `groesse`
+    + `monat_der_geburt` to `geburtsmonat`
+  
+```{r}
+#| echo: false
+df_groesse <-
+  read_csv(here("daten/groesse_geburtstag.csv")) |> 
+  clean_names() |> 
+  rename(
+    groesse = grosse,
+    geburtsmonat = monat_der_geburt
+  ) |> 
+  mutate(l1 = as_factor(l1))
+```
+
+## Plots {.unnumbered}
+
+1. produce a scatterplot using our `df_groesse` dataset, visualising the relationship between our birth day and our birth days (this doesn't make sense to compare, but it's just an exercise). Set the colour and shape to correspond to `L1`. Add a plot title.
+2. Find your birthday on the plot.
+3. Produce a barplot showing the number of observations per `l1`
+
+```{r}
+#| eval: false
+#| echo: false
+df_groesse |> 
+  ggplot() +
+  aes(x = geburtsmonat, y = tag, colour = l1, shape = l1) +
+  labs(title = "Geburtsmonat und Geburtstag",
+       y = "Geburtsag",
+       x = "Geburtsmonat") +
+  geom_point() +
+  theme_bw()
+```
+
+```{r}
+#| eval: false
+#| echo: false
+df_groesse |> 
+  ggplot() +
+  aes(x = l1, fill = l1) +
+  labs(title = "L1s",
+       y = "N",
+       x = "Muttersprache") +
+  geom_bar() +
+  theme_bw()
+```
+
+
+
+
+# Session Info {.unnumbered}
+
+```{r}
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+RStudio.Version()$release_name
+```
+
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.9.0.463 (Desert Sunflower).
+
+```{r}
+sessionInfo()
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
