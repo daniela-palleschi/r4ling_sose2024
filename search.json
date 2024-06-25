@@ -2152,615 +2152,6 @@
     "text": "Reproduce the following plots as exactly as you can (hint: you will need the position = \"dodge\" argument):"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "",
-    "section": "",
-    "text": "Code\n\n\n\n\n\nVorwort\nDieses Web-Book enthält Folien für die Vorlesung ‘Angewandte Datenverarbeitung und Visualisierung’ im Sommersemester 2024: R für Linguistik und Sozialwissenschaften’ (und andere Iterationen) und begleiten das Web-Book Angewandte Datenverarbeitung und Visualisierung von Daniela Palleschi an der Humboldt-Universität zu Berlin. Die Materialien sind lose an die Materialien von Wickham et al. (2023) angelehnt, wobei alle Beispieldaten durch linguistische Datensätze ersetzt wurden. Das Thema der Woche ist in der Seitenleiste in chronologischer Reihenfolge aufgeführt. Es sind drei Ausgabeformate verfügbar, die alle den gleichen Inhalt haben:\n\nHTML-Seite\nPDF des Inhalts\nRevealJS-Folien (optimal formatiert)\n\nDie Inhalte wurden für die Folienausgabe formatiert. Tabellen und Abbildungen können in den Formaten 1 und 2 zu groß/klein sein. Auf der HTML-Seite können die anderen beiden Formate durch Anklicken des Symbols unter “Andere Formate” (unten in der rechten Seitenleiste) angezeigt werden.\n\n\n\n\n\n\n\nReferences\n\nWickham, H., Çetinkaya-Rundel, M., & Grolemund, G. (2023). R for Data Science (2nd ed.)."
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html",
-    "title": "Datenvisualisierung 4",
-    "section": "",
-    "text": "For further reading and practice on this topic, I suggest reading Section 11.5 (Communication: Themes) in Wickham et al. (2023), and Chapter 4 (Representing summary statistics) in Nordmann et al. (2022)."
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#packages",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#packages",
-    "title": "Datenvisualisierung 4",
-    "section": "Packages",
-    "text": "Packages\nToday, we’re loading our relevant tidyverse packages directly: dplyr and ggplot. These are the only To aid us in loading in our data, we’re also loading the here package, and the janitor package which is useful for tidying up our data (e.g., the clean_names() function). To customise our plots we’re also using the ggthemes and patchwork packages. The former helps us produce plots that are colour-blind friendly, while the latter allows us to print multiple plots together. We also need a new package: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#data",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#data",
-    "title": "Datenvisualisierung 4",
-    "section": "Data",
-    "text": "Data\nWe’re again working with our slightly altered version of the english dataset from the languageR package.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#adding-a-boxplot",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#adding-a-boxplot",
-    "title": "Datenvisualisierung 4",
-    "section": "1.1 Adding a boxplot",
-    "text": "1.1 Adding a boxplot\nWe can also add another geom to add more information to the plot. Let’s add a boxplot.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_nudge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_nudge",
-    "title": "Datenvisualisierung 4",
-    "section": "1.2 position_nudge()",
-    "text": "1.2 position_nudge()\nMaybe we want to move the boxplot so that it’s not overtop of the density plots, and so that it’s not quite as wide. We can do this by setting position to position_nudge(), and width to some value smaller than .75, which is the default width.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_jitter-for-scatterplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_jitter-for-scatterplots",
-    "title": "Datenvisualisierung 4",
-    "section": "1.3 position_jitter() for scatterplots",
-    "text": "1.3 position_jitter() for scatterplots\nThis is from a family of options that allow us to alter the position of geoms. For example, Abbildung 4 A and B both show the exact same data, but Abbildung 4 B includes position = position_jitter(0.2) to move overlapping points. This way we get a good idea of how many observations there were across reaction times (y-axis).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#combining-all-three",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#combining-all-three",
-    "title": "Datenvisualisierung 4",
-    "section": "1.4 Combining all three",
-    "text": "1.4 Combining all three\nIf we put all of these plots together, we get a Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\n\n\n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#pivot_longer-summarise",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#pivot_longer-summarise",
-    "title": "Datenvisualisierung 4",
-    "section": "2.1 pivot_longer() |> summarise()",
-    "text": "2.1 pivot_longer() |&gt; summarise()\nLet’s reproduce something similar using the english dataset. First, we’ll use pivot_longer() to lengthen our data, then we’ll create a summary of reaction times for the lexical decision task and naming task per age group.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#overlapping-errorbars",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#overlapping-errorbars",
-    "title": "Datenvisualisierung 4",
-    "section": "2.2 Overlapping errorbars",
-    "text": "2.2 Overlapping errorbars\nIf we create an errorbar plot of this data, we get Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\n\n\n\n\nAbbildung 7: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_dodge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_dodge",
-    "title": "Datenvisualisierung 4",
-    "section": "2.3 position_dodge()",
-    "text": "2.3 position_dodge()\nWe can add position = position_dodge(0.2) to force the errorbars to not overlap. We’ll also adjust their width so they’re not so wide (any value lower than 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 8: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#dodging-all-relevant-geoms",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#dodging-all-relevant-geoms",
-    "title": "Datenvisualisierung 4",
-    "section": "2.4 dodging all relevant geoms",
-    "text": "2.4 dodging all relevant geoms\nBut now we’ve left the points behind. We need to also dodge the points, so we add position_dodge() to geom_point(), making sure to use the same value as we did with geom_errorbar().\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 9: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#default-themes",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#default-themes",
-    "title": "Datenvisualisierung 4",
-    "section": "3.1 Default themes",
-    "text": "3.1 Default themes\nFirstly, theme_minimal() was added to each plot to customise the general look. There are a variety of custom themes to try, like theme_bw() or theme_classic(). Try them out.\n\n\n\n\n\n\n\n\nAbbildung 11: Preset themes"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#theme",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#theme",
-    "title": "Datenvisualisierung 4",
-    "section": "3.2 theme()",
-    "text": "3.2 theme()\nWe can also control individual components of theme by adding customisations with theme(). For example we see in Abbildung 10 A the axis titles are bolded. This was achieved by adding theme(axis.title = element_text(face = \"bold)), where axis.title = indicates we want to make a change to the axis titles, element_text() indicates it’s their text that we want to change, and face = \"bold\" indicates we want to make the text bold. The same was done for legend.title = to make the legend title bold.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\n\nAbbildung 12: Using theme()"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#packages",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#packages",
-    "title": "Datenvisualisierung 4",
-    "section": "Packages",
-    "text": "Packages\nToday, we’re loading our relevant tidyverse packages directly: dplyr and ggplot. These are the only To aid us in loading in our data, we’re also loading the here package, and the janitor package which is useful for tidying up our data (e.g., the clean_names() function). To customise our plots we’re also using the ggthemes and patchwork packages. The former helps us produce plots that are colour-blind friendly, while the latter allows us to print multiple plots together. We also need a new package: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#data",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#data",
-    "title": "Datenvisualisierung 4",
-    "section": "Data",
-    "text": "Data\nWe’re again working with our slightly altered version of the english dataset from the languageR package.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#adding-a-boxplot",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#adding-a-boxplot",
-    "title": "Datenvisualisierung 4",
-    "section": "Adding a boxplot",
-    "text": "Adding a boxplot\nWe can also add another geom to add more information to the plot. Let’s add a boxplot.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_nudge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_nudge",
-    "title": "Datenvisualisierung 4",
-    "section": "position_nudge()",
-    "text": "position_nudge()\nMaybe we want to move the boxplot so that it’s not overtop of the density plots, and so that it’s not quite as wide. We can do this by setting position to position_nudge(), and width to some value smaller than .75, which is the default width.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_jitter-for-scatterplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_jitter-for-scatterplots",
-    "title": "Datenvisualisierung 4",
-    "section": "position_jitter() for scatterplots",
-    "text": "position_jitter() for scatterplots\nThis is from a family of options that allow us to alter the position of geoms. For example, Abbildung 4 A and B both show the exact same data, but Abbildung 4 B includes position = position_jitter(0.2) to move overlapping points. This way we get a good idea of how many observations there were across reaction times (y-axis).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#combining-all-three",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#combining-all-three",
-    "title": "Datenvisualisierung 4",
-    "section": "Combining all three",
-    "text": "Combining all three\nIf we put all of these plots together, we get a Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#pivot_longer-summarise",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#pivot_longer-summarise",
-    "title": "Datenvisualisierung 4",
-    "section": "pivot_longer() |> summarise()",
-    "text": "pivot_longer() |&gt; summarise()\nLet’s reproduce something similar using the english dataset. First, we’ll use pivot_longer() to lengthen our data, then we’ll create a summary of reaction times for the lexical decision task and naming task per age group.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#overlapping-errorbars",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#overlapping-errorbars",
-    "title": "Datenvisualisierung 4",
-    "section": "Overlapping errorbars",
-    "text": "Overlapping errorbars\nIf we create an errorbar plot of this data, we get Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\nAbbildung 7: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_dodge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_dodge",
-    "title": "Datenvisualisierung 4",
-    "section": "position_dodge()",
-    "text": "position_dodge()\nWe can add position = position_dodge(0.2) to force the errorbars to not overlap. We’ll also adjust their width so they’re not so wide (any value lower than 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 8: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#dodging-all-relevant-geoms",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#dodging-all-relevant-geoms",
-    "title": "Datenvisualisierung 4",
-    "section": "dodging all relevant geoms",
-    "text": "dodging all relevant geoms\nBut now we’ve left the points behind. We need to also dodge the points, so we add position_dodge() to geom_point(), making sure to use the same value as we did with geom_errorbar().\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 9: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#default-themes",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#default-themes",
-    "title": "Datenvisualisierung 4",
-    "section": "Default themes",
-    "text": "Default themes\nFirstly, theme_minimal() was added to each plot to customise the general look. There are a variety of custom themes to try, like theme_bw() or theme_classic(). Try them out.\n\n\nAbbildung 11: Preset themes"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#theme",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#theme",
-    "title": "Datenvisualisierung 4",
-    "section": "theme()",
-    "text": "theme()\nWe can also control individual components of theme by adding customisations with theme(). For example we see in Abbildung 10 A the axis titles are bolded. This was achieved by adding theme(axis.title = element_text(face = \"bold)), where axis.title = indicates we want to make a change to the axis titles, element_text() indicates it’s their text that we want to change, and face = \"bold\" indicates we want to make the text bold. The same was done for legend.title = to make the legend title bold.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\nAbbildung 12: Using theme()"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#paket-angeben",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#paket-angeben",
-    "title": "Troubleshooting",
-    "section": "Paket angeben",
-    "text": "Paket angeben\n\nwir müssen angeben, dass sie aus dem Paket pacman stammt\n\noder wir könnten dieser Zeile library(pacman) voranstellen\n\n\n\npacman::p_load(tidyverse,\n               janitor,\n               here,\n               languageR)"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#syntaxfehler",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#syntaxfehler",
-    "title": "Troubleshooting",
-    "section": "Syntaxfehler",
-    "text": "Syntaxfehler\n\nSyntaxfehler beziehen sich auf Fehler aufgrund von ungültigem Code\n\nam häufigsten fehlende Komma oder Klammer\nTippfehler bei Funktions-, Objekt- oder Variablennamen"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rstudio-syntax-checker",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rstudio-syntax-checker",
-    "title": "Troubleshooting",
-    "section": "RStudio-Syntax-Checker",
-    "text": "RStudio-Syntax-Checker\n\nRStudio erkennt in der Regel Syntaxfehler und teilt Ihnen vor der Ausführung Ihres Codes mit, ob Sie etwas übersehen haben. Das folgende Code-Stück gibt zum Beispiel eine Fehlermeldung aus.\n\n\nlexdec[c(\"Subject\", \"RT\" \"Correct\")]\n\n\n\nError: &lt;text&gt;:1:26: unexpected string constant\n1: lexdec[c(\"Subject\", \"RT\" \"Correct\"\n                             ^\n\n\n\nWir sehen ein rotes “X” neben der Zeilennummer (42) sowie eine rote Unterstreichung für den problematischen oder unerwarteten Code.\n\n\n\nAbbildung 3: RStudio-Syntaxfehler-Warnung"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#section",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#section",
-    "title": "Troubleshooting",
-    "section": "",
-    "text": "Abbildung 4: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#eval-false",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#eval-false",
-    "title": "Troubleshooting",
-    "section": "eval: false",
-    "text": "eval: false\n\nDer erste Codeabschnitt in Abbildung 5 enthält die Option eval: false, und wird daher beim Rendern des Skripts nicht ausgeführt\nDer zweite Codeabschnitt versucht dann, die ersten 6 Zeilen des Datensatzes lexdec zu drucken, der Teil des Pakets languageR ist\ndaher wird das Objekt 'lexdec' nicht gefunden.\nDies ist insofern informativ: es sagt uns nicht explizit, dass es daran liegt, dass wir das Paket nicht geladen haben\n\nBei solchen Fehlern müssen wir manchmal nachforschen, indem wir unseren Code untersuchen."
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#code-zeilen-und-chunk-nummern",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#code-zeilen-und-chunk-nummern",
-    "title": "Troubleshooting",
-    "section": "Code-Zeilen und Chunk-Nummern",
-    "text": "Code-Zeilen und Chunk-Nummern\n\nvielleicht haben wir ein sehr langes Skript geschrieben und es ist nicht klar, wo die Quelle des Problems liegt, wenn wir nur den Fehlertext betrachten\n\nwir erhalten auch Informationen darüber, wo Quarto auf ein Problem gestoßen ist: Qutting from lines 11-12 [unnamed-chunk-2] (Untitled.qmd)"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects",
-    "title": "Troubleshooting",
-    "section": "RProjects",
-    "text": "RProjects\n\n\nAbbildung 6: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-1",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-1",
-    "title": "Troubleshooting",
-    "section": "RProjects",
-    "text": "RProjects\n\nAbbildung 6: \"Users/danielapalleschi/daten/langaugeR_english.csv\" existiert nicht\n\nDiese Aussage ist richtig, da dieser Dateipfad auf meinem Rechner tatsächlich nicht existiert\n\nBeachten Sie, dass oben in der Mitte des Bildes “RStudio” steht und rechts daneben “Project: (None)”\n\nwir arbeiten nicht innerhalb eines RProjekts"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-2",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-2",
-    "title": "Troubleshooting",
-    "section": "RProjects",
-    "text": "RProjects\n\ndas gleiche Skript wird ohne Warnung ausgeführt, und Sie können sehen, dass wir innerhalb eines RProjekts mit dem Namen r4ling arbeiten\n\nund die csv-Datei wird ohne Warnung geladen\n\n\n\n\nAbbildung 7: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#google",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#google",
-    "title": "Troubleshooting",
-    "section": "Google",
-    "text": "Google\n\nIm Zweifelsfall: Google!\n\nMöglicherweise finden Sie einige Blogbeiträge oder Forenbeiträge, in denen das Problem und mögliche Lösungen diskutiert werden\n\nDies ist ein guter erster Schritt, um das Problem zu lösen."
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#stackoverflow",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#stackoverflow",
-    "title": "Troubleshooting",
-    "section": "Stackoverflow",
-    "text": "Stackoverflow\n\neine Online-Community für Entwickler mit vielen Forenbeiträgen zu R-Programmierproblemen\nIn der Regel finden Sie einen Thread, in dem jemand das gleiche Problem hatte wie Sie, und mehrere andere antworten mit möglichen Lösungen\nWenn Sie wirklich nicht weiterkommen, können Sie sogar Ihre eigene Frage stellen! Dazu müssen Sie ein Konto erstellen"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#dokumentation",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#dokumentation",
-    "title": "Troubleshooting",
-    "section": "Dokumentation",
-    "text": "Dokumentation\n\nes gibt eine Fülle von Dokumentationen für Pakete (und Funktionen)\nin der Console: ?Paket oder ?Funktion"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#chatgpt",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#chatgpt",
-    "title": "Troubleshooting",
-    "section": "ChatGPT",
-    "text": "ChatGPT\n\nChatbots work best for small, discrete programming tasks, such as loading data, performing basic data manipulations and creating visualizations and websites.\n— Perkel (2023)\n\n\nWenn Sie ChatGPT Ihre Fehlermeldung oder sogar den problematischen Code geben, können Sie eine schnelle Erklärung des Problems und eine Lösung finden\n\nDies kann ein wertvolles Lernmittel sein"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html",
-    "title": "Troubleshooting",
-    "section": "",
-    "text": "In diesem Abschnitt werden wir lernen\n\nwie man mit allgemeinen Warnungen und Fehlermeldungen umgeht\nwie man Fehler beim Rendern von Quarto-Skripten behebt\nwo man Hilfe findet, wenn man mit fehlerhaftem Code nicht weiterkommt"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#paket-angeben",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#paket-angeben",
-    "title": "Troubleshooting",
-    "section": "1.1 Paket angeben",
-    "text": "1.1 Paket angeben\n\nwir müssen angeben, dass sie aus dem Paket pacman stammt\n\noder wir könnten dieser Zeile library(pacman) voranstellen\n\n\n\npacman::p_load(tidyverse,\n               janitor,\n               here,\n               languageR)"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#syntaxfehler",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#syntaxfehler",
-    "title": "Troubleshooting",
-    "section": "2.1 Syntaxfehler",
-    "text": "2.1 Syntaxfehler\n\nSyntaxfehler beziehen sich auf Fehler aufgrund von ungültigem Code\n\nam häufigsten fehlende Komma oder Klammer\nTippfehler bei Funktions-, Objekt- oder Variablennamen\n\n\n\n2.1.1 fehlende Zeichensetzung\n\nwas ist das Problem mit diesem Code?\n\n\nlexdec[c(\"Subject\", \"RT\", \"Correct\"]\n\nError: &lt;text&gt;:1:36: unexpected ']'\n1: lexdec[c(\"Subject\", \"RT\", \"Correct\"]\n                                       ^\n\n\n\n\n2.1.2 Typfehler\n\nwas ist das Problem mit diesem Code?\n\n\nlexdec[c(\"Subject\", \"rt\", \"Correct\")]\n\nError in `[.data.frame`(lexdec, c(\"Subject\", \"rt\", \"Correct\")): undefined columns selected\n\n\n\n\n2.1.3 Tidyverse-Meldungen\n\ndas Tidyverse hat normaleweise sehr informative Meldungen\n\n\nlexdec |&gt; \n  select(\"Subjct\", \"RT\", \"Correct\")\n\nError in `select()`:\n! Can't select columns that don't exist.\n✖ Column `Subjct` doesn't exist.\n\n\n\nHier wird uns genau gesagt, wo das Problem liegt: Wir haben keine Variable namens Subjct\n\n\nlexdec |&gt; \n  select(\"subject\", \"RT\", \"Correct\")\n\nError in `select()`:\n! Can't select columns that don't exist.\n✖ Column `subject` doesn't exist.\n\n\n\nDieses Mal ist der Tippfehler auf die Groß- und Kleinschreibung zurückzuführen, denn unsere Variable Subjekt beginnt mit einem großen S\n\n\n\n2.1.4 häufige Syntaxfehler\nEinige häufige Syntaxfehler sind:\n\nfalsche Großschreibung (z.B. Lexdec$Subject statt lexdec$Subject)\nTippfehler (z. B. Länge(lexdec) statt Länge(lexdec))\nschließende Interpunktion, wie z. B. ein schließendes Anführungszeichen, eine Klammer oder eine eckige Klammer\nfortgesetzte Interpunktion, typischerweise fehlt ein Komma oder eine Pipe\n\n\n\n\n\n\n\n\n\nAbbildung 2: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rstudio-syntax-checker",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rstudio-syntax-checker",
-    "title": "Troubleshooting",
-    "section": "2.2 RStudio-Syntax-Checker",
-    "text": "2.2 RStudio-Syntax-Checker\n\nRStudio erkennt in der Regel Syntaxfehler und teilt Ihnen vor der Ausführung Ihres Codes mit, ob Sie etwas übersehen haben. Das folgende Code-Stück gibt zum Beispiel eine Fehlermeldung aus.\n\n\nlexdec[c(\"Subject\", \"RT\" \"Correct\")]\n\nError: &lt;text&gt;:1:26: unexpected string constant\n1: lexdec[c(\"Subject\", \"RT\" \"Correct\"\n                             ^\n\n\n\nWir sehen ein rotes “X” neben der Zeilennummer (42) sowie eine rote Unterstreichung für den problematischen oder unerwarteten Code.\n\n\n\n\n\n\n\n\n\nAbbildung 3: RStudio-Syntaxfehler-Warnung"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#section",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#section",
-    "title": "Troubleshooting",
-    "section": "",
-    "text": "Abbildung 4: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#eval-false",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#eval-false",
-    "title": "Troubleshooting",
-    "section": "3.1 eval: false",
-    "text": "3.1 eval: false\n\nDer erste Codeabschnitt in Abbildung 5 enthält die Option eval: false, und wird daher beim Rendern des Skripts nicht ausgeführt\nDer zweite Codeabschnitt versucht dann, die ersten 6 Zeilen des Datensatzes lexdec zu drucken, der Teil des Pakets languageR ist\ndaher wird das Objekt 'lexdec' nicht gefunden.\nDies ist insofern informativ: es sagt uns nicht explizit, dass es daran liegt, dass wir das Paket nicht geladen haben\n\nBei solchen Fehlern müssen wir manchmal nachforschen, indem wir unseren Code untersuchen."
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#code-zeilen-und-chunk-nummern",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#code-zeilen-und-chunk-nummern",
-    "title": "Troubleshooting",
-    "section": "3.2 Code-Zeilen und Chunk-Nummern",
-    "text": "3.2 Code-Zeilen und Chunk-Nummern\n\nvielleicht haben wir ein sehr langes Skript geschrieben und es ist nicht klar, wo die Quelle des Problems liegt, wenn wir nur den Fehlertext betrachten\n\nwir erhalten auch Informationen darüber, wo Quarto auf ein Problem gestoßen ist: Qutting from lines 11-12 [unnamed-chunk-2] (Untitled.qmd)"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects",
-    "title": "Troubleshooting",
-    "section": "3.3 RProjects",
-    "text": "3.3 RProjects\n\n\n\n\n\n\n\n\nAbbildung 6: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-1",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-1",
-    "title": "Troubleshooting",
-    "section": "RProjects",
-    "text": "RProjects\n\nAbbildung 6: \"Users/danielapalleschi/daten/langaugeR_english.csv\" existiert nicht\n\nDiese Aussage ist richtig, da dieser Dateipfad auf meinem Rechner tatsächlich nicht existiert\n\nBeachten Sie, dass oben in der Mitte des Bildes “RStudio” steht und rechts daneben “Project: (None)”\n\nwir arbeiten nicht innerhalb eines RProjekts"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-2",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-2",
-    "title": "Troubleshooting",
-    "section": "RProjects",
-    "text": "RProjects\n\ndas gleiche Skript wird ohne Warnung ausgeführt, und Sie können sehen, dass wir innerhalb eines RProjekts mit dem Namen r4ling arbeiten\n\nund die csv-Datei wird ohne Warnung geladen\n\n\n\n\n\n\n\n\n\n\nAbbildung 7: Kunstwerke von Alison Horst"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#google",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#google",
-    "title": "Troubleshooting",
-    "section": "4.1 Google",
-    "text": "4.1 Google\n\nIm Zweifelsfall: Google!\n\nMöglicherweise finden Sie einige Blogbeiträge oder Forenbeiträge, in denen das Problem und mögliche Lösungen diskutiert werden\n\nDies ist ein guter erster Schritt, um das Problem zu lösen."
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#stackoverflow",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#stackoverflow",
-    "title": "Troubleshooting",
-    "section": "4.2 Stackoverflow",
-    "text": "4.2 Stackoverflow\n\neine Online-Community für Entwickler mit vielen Forenbeiträgen zu R-Programmierproblemen\nIn der Regel finden Sie einen Thread, in dem jemand das gleiche Problem hatte wie Sie, und mehrere andere antworten mit möglichen Lösungen\nWenn Sie wirklich nicht weiterkommen, können Sie sogar Ihre eigene Frage stellen! Dazu müssen Sie ein Konto erstellen"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#dokumentation",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#dokumentation",
-    "title": "Troubleshooting",
-    "section": "4.3 Dokumentation",
-    "text": "4.3 Dokumentation\n\nes gibt eine Fülle von Dokumentationen für Pakete (und Funktionen)\nin der Console: ?Paket oder ?Funktion"
-  },
-  {
-    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#chatgpt",
-    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#chatgpt",
-    "title": "Troubleshooting",
-    "section": "4.4 ChatGPT",
-    "text": "4.4 ChatGPT\n\nChatbots work best for small, discrete programming tasks, such as loading data, performing basic data manipulations and creating visualizations and websites.\n— Perkel (2023)\n\n\nWenn Sie ChatGPT Ihre Fehlermeldung oder sogar den problematischen Code geben, können Sie eine schnelle Erklärung des Problems und eine Lösung finden\n\nDies kann ein wertvolles Lernmittel sein\n\n\n\n4.4.1 ChatGPT: Vorsicht\n\nChatGPT wird Ihnen zum Beispiel nicht sagen können, dass Sie einen Variablennamen mit Kamelhülsen geschrieben haben (cameCaseLooksLikeThis), wenn Ihre Variablen mit Schlangenhülsen benannt sind (snake_case_looks_like_this)\n\noder wenn es einen anderen Tippfehler gibt, der nichts mit der Syntax zu tun hat\n\nWenn Sie in der Lage sind, Fehler-/Warnmeldungen zu interpretieren und die Ursache des Problems ausfindig zu machen, ist das der schnellste Weg zur Lösung.\n\n\n\n\n\n\nThe temptation to copy and paste code snippets from ChatGPT or Stackoverflow is real, but true mastery lies in comprehension. I've copied and pasted a lot of code. But as a programmer, it's your duty to understand. And to do so, you'll eventually end up in documentation 😉. pic.twitter.com/HWi09tPz6O\n\n— Travis Oliphant ((teoliphant?)) October 20, 2023\n\n\n\n\n4.4.2 ChatGPT: Vertrauen, aber überprüfen\n\nes ist wichtig zu wissen, dass ChatGPT ein Tausendsassa ist, der nichts beherrscht\n“Vertrauen, aber überprüfen” (Perkel, 2023)\n\nVertrauen Sie nicht blind auf das, was die KI Ihnen sagt\n\nSeien Sie also skeptisch gegenüber den Lösungen, die ChatGPT Ihnen anbietet, vor allem, wenn Ihre Probleme komplexer werden\nTesten Sie immer, ob der vorgeschlagene Code nicht nur ohne eine weitere Warnung oder Fehlermeldung läuft, sondern ob er auch das erreicht, was Sie erwarten\n\n\n\n4.4.3 \n\n\n\n\n\n\nDisclaimer\n\n\n\n\nChatGPT und Datenschutz: Alles, was Sie in ChatGPT eingeben, wird an die Server von OpenAI gesendet und kann für Trainingszwecke verwendet werden. Geben Sie niemals sensible Informationen in ChatGPT ein.\nChatGPT und akademische Integrität: Schauen Sie sich unbedingt die Empfehlungen für das Umgehen mit Künstlicher Intelligenz in Prüfungen der Humboldt-Universität an\nAktualität: Darüber hinaus werden LLM (Large Language Models) auf Daten trainiert, die aktuell sein können oder auch nicht\n\nzum Beispiel wird ChatGPT vielleicht nicht auf der neuesten Version eines Pakets trainiert und ist sich daher möglicherweise der Probleme mit einem veralteten Argument nicht bewusst\n\nEthik der KI: weiteres, allgemeineres Problem bei der Verwendung von ChatGPT oder einem anderen LMM (Large Language Model)\n\nis es ethisch vertretbar, sich zu sehr auf künstliche Intelligenz zu verlassen, bei der wiederholt festgestellt wurde, dass sie rassische und geschlechtsspezifische Vorurteile hat?"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pakete",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pakete",
-    "title": "Datenvisualisierung 4",
-    "section": "Pakete",
-    "text": "Pakete\nHeute laden wir unsere relevanten tidyverse-Pakete direkt: dplyr und ggplot. Dies sind die einzigen Pakete, die uns beim Laden unserer Daten helfen. Wir laden auch das here-Paket und das janitor-Paket, das für das Aufräumen unserer Daten nützlich ist (z.B. die Funktion clean_names()). Um unsere Diagramme anzupassen, verwenden wir auch die Pakete ggthemes und patchwork. Ersteres hilft uns bei der Erstellung von farbenblindenfreundlichen Plots, während letzteres uns erlaubt, mehrere Plots zusammen zu drucken. Wir brauchen auch ein neues Paket: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#daten",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#daten",
-    "title": "Datenvisualisierung 4",
-    "section": "Daten",
-    "text": "Daten\nWir arbeiten wieder mit unserer leicht veränderten Version des english-Datensatzes aus dem Paket languageR.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#hinzufügen-eines-boxplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#hinzufügen-eines-boxplots",
-    "title": "Datenvisualisierung 4",
-    "section": "Hinzufügen eines Boxplots",
-    "text": "Hinzufügen eines Boxplots\nWir können auch ein weiteres Geom hinzufügen, um dem Diagramm weitere Informationen hinzuzufügen. Fügen wir einen Boxplot hinzu.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_nudge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_nudge",
-    "title": "Datenvisualisierung 4",
-    "section": "position_nudge()",
-    "text": "position_nudge()\nVielleicht wollen wir den Boxplot so verschieben, dass er nicht über den Dichteplots liegt und nicht ganz so breit ist. Wir können dies tun, indem wir position auf position_nudge() und width auf einen Wert kleiner als .75 setzen, was die Standardbreite ist.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_jitter-für-scatterplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_jitter-für-scatterplots",
-    "title": "Datenvisualisierung 4",
-    "section": "position_jitter() für Scatterplots",
-    "text": "position_jitter() für Scatterplots\nDies gehört zu einer Familie von Optionen, mit denen man die Position von Geomen verändern kann. Zum Beispiel zeigen Abbildung 4 A und B beide genau die gleichen Daten, aber Abbildung 4 B enthält position = position_jitter(0.2), um überlappende Punkte zu verschieben. Auf diese Weise erhalten wir eine gute Vorstellung davon, wie viele Beobachtungen es über die Reaktionszeiten hinweg gab (y-Achse).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#kombiniert-alle-drei",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#kombiniert-alle-drei",
-    "title": "Datenvisualisierung 4",
-    "section": "Kombiniert alle drei",
-    "text": "Kombiniert alle drei\nWenn wir alle diese Diagramme zusammenfügen, erhalten wir eine Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pivot_longer-summarise",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pivot_longer-summarise",
-    "title": "Datenvisualisierung 4",
-    "section": "pivot_longer() |> summarise()",
-    "text": "pivot_longer() |&gt; summarise()\nLassen Sie uns etwas Ähnliches mit dem Datensatz “Englisch” nachstellen. Zuerst werden wir pivot_longer() verwenden, um unsere Daten zu verlängern, dann erstellen wir eine Zusammenfassung der Reaktionszeiten für die lexikalische Entscheidungsaufgabe und die Benennungsaufgabe pro Altersgruppe.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#überlappende-fehlerbalken",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#überlappende-fehlerbalken",
-    "title": "Datenvisualisierung 4",
-    "section": "Überlappende Fehlerbalken",
-    "text": "Überlappende Fehlerbalken\nWenn wir für diese Daten ein Fehlerbalken-Diagramm erstellen, erhalten wir Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\nAbbildung 7: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_dodge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_dodge",
-    "title": "Datenvisualisierung 4",
-    "section": "position_dodge()",
-    "text": "position_dodge()\nWir können position = position_dodge(0.2) hinzufügen, damit sich die Fehlerbalken nicht überlappen. Wir werden auch ihre width anpassen, damit sie nicht so breit sind (jeder Wert unter 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 8: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#ausweichen-vor-allen-relevanten-geomen",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#ausweichen-vor-allen-relevanten-geomen",
-    "title": "Datenvisualisierung 4",
-    "section": "Ausweichen vor allen relevanten Geomen",
-    "text": "Ausweichen vor allen relevanten Geomen\nAber jetzt haben wir die Punkte hinter uns gelassen. Wir müssen auch den Punkten ausweichen, also fügen wir position_dodge() zu geom_point() hinzu und stellen sicher, dass wir den gleichen Wert wie bei geom_errorbar() verwenden.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 9: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#standardthemen",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#standardthemen",
-    "title": "Datenvisualisierung 4",
-    "section": "Standardthemen",
-    "text": "Standardthemen\nZunächst wurde theme_minimal() zu jedem Plot hinzugefügt, um das allgemeine Aussehen anzupassen. Es gibt eine Vielzahl von benutzerdefinierten Themen, wie theme_bw() oder theme_classic(). Probieren Sie sie aus.\n\n\nAbbildung 11: Preset themes"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#theme",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#theme",
-    "title": "Datenvisualisierung 4",
-    "section": "theme()",
-    "text": "theme()\nWir können auch einzelne Komponenten des Themas steuern, indem wir Anpassungen mit theme() hinzufügen. Zum Beispiel sehen wir in Abbildung 10 A, dass die Achsentitel fett gedruckt sind. Dies wurde durch Hinzufügen von theme(axis.title = element_text(face = \"bold)) erreicht, wobei axis.title = anzeigt, dass wir eine Änderung an den Achsentiteln vornehmen wollen, element_text() zeigt an, dass es ihr Text ist, den wir ändern wollen, und face = \"bold\" zeigt an, dass wir den Text fett machen wollen. Dasselbe wurde für legend.title = gemacht, um den Titel der Legende fett zu machen.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\nAbbildung 12: Using theme()"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html",
-    "title": "Datenvisualisierung 4",
-    "section": "",
-    "text": "Für weitere Lektüre und Übungen zu diesem Thema empfehle ich die Lektüre von Abschnitt 11.5 (Kommunikation: Themen) in Wickham et al. (2023) und Kapitel 4 (Darstellung von zusammenfassenden Statistiken) in Nordmann et al. (2022)."
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pakete",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pakete",
-    "title": "Datenvisualisierung 4",
-    "section": "Pakete",
-    "text": "Pakete\nHeute laden wir unsere relevanten tidyverse-Pakete direkt: dplyr und ggplot. Dies sind die einzigen Pakete, die uns beim Laden unserer Daten helfen. Wir laden auch das here-Paket und das janitor-Paket, das für das Aufräumen unserer Daten nützlich ist (z.B. die Funktion clean_names()). Um unsere Diagramme anzupassen, verwenden wir auch die Pakete ggthemes und patchwork. Ersteres hilft uns bei der Erstellung von farbenblindenfreundlichen Plots, während letzteres uns erlaubt, mehrere Plots zusammen zu drucken. Wir brauchen auch ein neues Paket: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#daten",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#daten",
-    "title": "Datenvisualisierung 4",
-    "section": "Daten",
-    "text": "Daten\nWir arbeiten wieder mit unserer leicht veränderten Version des english-Datensatzes aus dem Paket languageR.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#hinzufügen-eines-boxplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#hinzufügen-eines-boxplots",
-    "title": "Datenvisualisierung 4",
-    "section": "1.1 Hinzufügen eines Boxplots",
-    "text": "1.1 Hinzufügen eines Boxplots\nWir können auch ein weiteres Geom hinzufügen, um dem Diagramm weitere Informationen hinzuzufügen. Fügen wir einen Boxplot hinzu.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_nudge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_nudge",
-    "title": "Datenvisualisierung 4",
-    "section": "1.2 position_nudge()",
-    "text": "1.2 position_nudge()\nVielleicht wollen wir den Boxplot so verschieben, dass er nicht über den Dichteplots liegt und nicht ganz so breit ist. Wir können dies tun, indem wir position auf position_nudge() und width auf einen Wert kleiner als .75 setzen, was die Standardbreite ist.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_jitter-für-scatterplots",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_jitter-für-scatterplots",
-    "title": "Datenvisualisierung 4",
-    "section": "1.3 position_jitter() für Scatterplots",
-    "text": "1.3 position_jitter() für Scatterplots\nDies gehört zu einer Familie von Optionen, mit denen man die Position von Geomen verändern kann. Zum Beispiel zeigen Abbildung 4 A und B beide genau die gleichen Daten, aber Abbildung 4 B enthält position = position_jitter(0.2), um überlappende Punkte zu verschieben. Auf diese Weise erhalten wir eine gute Vorstellung davon, wie viele Beobachtungen es über die Reaktionszeiten hinweg gab (y-Achse).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#kombiniert-alle-drei",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#kombiniert-alle-drei",
-    "title": "Datenvisualisierung 4",
-    "section": "1.4 Kombiniert alle drei",
-    "text": "1.4 Kombiniert alle drei\nWenn wir alle diese Diagramme zusammenfügen, erhalten wir eine Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\n\n\n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pivot_longer-summarise",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pivot_longer-summarise",
-    "title": "Datenvisualisierung 4",
-    "section": "2.1 pivot_longer() |> summarise()",
-    "text": "2.1 pivot_longer() |&gt; summarise()\nLassen Sie uns etwas Ähnliches mit dem Datensatz “Englisch” nachstellen. Zuerst werden wir pivot_longer() verwenden, um unsere Daten zu verlängern, dann erstellen wir eine Zusammenfassung der Reaktionszeiten für die lexikalische Entscheidungsaufgabe und die Benennungsaufgabe pro Altersgruppe.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#überlappende-fehlerbalken",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#überlappende-fehlerbalken",
-    "title": "Datenvisualisierung 4",
-    "section": "2.2 Überlappende Fehlerbalken",
-    "text": "2.2 Überlappende Fehlerbalken\nWenn wir für diese Daten ein Fehlerbalken-Diagramm erstellen, erhalten wir Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\n\n\n\n\nAbbildung 7: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_dodge",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_dodge",
-    "title": "Datenvisualisierung 4",
-    "section": "2.3 position_dodge()",
-    "text": "2.3 position_dodge()\nWir können position = position_dodge(0.2) hinzufügen, damit sich die Fehlerbalken nicht überlappen. Wir werden auch ihre width anpassen, damit sie nicht so breit sind (jeder Wert unter 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 8: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#ausweichen-vor-allen-relevanten-geomen",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#ausweichen-vor-allen-relevanten-geomen",
-    "title": "Datenvisualisierung 4",
-    "section": "2.4 Ausweichen vor allen relevanten Geomen",
-    "text": "2.4 Ausweichen vor allen relevanten Geomen\nAber jetzt haben wir die Punkte hinter uns gelassen. Wir müssen auch den Punkten ausweichen, also fügen wir position_dodge() zu geom_point() hinzu und stellen sicher, dass wir den gleichen Wert wie bei geom_errorbar() verwenden.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 9: Overlapping errorbar plot"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#standardthemen",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#standardthemen",
-    "title": "Datenvisualisierung 4",
-    "section": "3.1 Standardthemen",
-    "text": "3.1 Standardthemen\nZunächst wurde theme_minimal() zu jedem Plot hinzugefügt, um das allgemeine Aussehen anzupassen. Es gibt eine Vielzahl von benutzerdefinierten Themen, wie theme_bw() oder theme_classic(). Probieren Sie sie aus.\n\n\n\n\n\n\n\n\nAbbildung 11: Preset themes"
-  },
-  {
-    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#theme",
-    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#theme",
-    "title": "Datenvisualisierung 4",
-    "section": "3.2 theme()",
-    "text": "3.2 theme()\nWir können auch einzelne Komponenten des Themas steuern, indem wir Anpassungen mit theme() hinzufügen. Zum Beispiel sehen wir in Abbildung 10 A, dass die Achsentitel fett gedruckt sind. Dies wurde durch Hinzufügen von theme(axis.title = element_text(face = \"bold)) erreicht, wobei axis.title = anzeigt, dass wir eine Änderung an den Achsentiteln vornehmen wollen, element_text() zeigt an, dass es ihr Text ist, den wir ändern wollen, und face = \"bold\" zeigt an, dass wir den Text fett machen wollen. Dasselbe wurde für legend.title = gemacht, um den Titel der Legende fett zu machen.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\n\nAbbildung 12: Using theme()"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#pakete",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#pakete",
-    "title": "Datenvisualisierung 3",
-    "section": "Pakete",
-    "text": "Pakete\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork)"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#daten",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#daten",
-    "title": "Datenvisualisierung 3",
-    "section": "Daten",
-    "text": "Daten\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#boxplot",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#boxplot",
-    "title": "Datenvisualisierung 3",
-    "section": "Boxplot",
-    "text": "Boxplot\n\n\n\nauch bekannt als Box-and-Whisker-Plots, enthalten\n\neine Box\neine Linie in der Mitte der Box\nLinien, die an beiden Enden der Box herausragen (die ‘Whisker’)\nmanchmal Punkte"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkenplots",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkenplots",
-    "title": "Datenvisualisierung 3",
-    "section": "Fehlerbalkenplots",
-    "text": "Fehlerbalkenplots\n\n\n\nDiese Diagramme bestehen aus 2 Teilen:\n\nder Mittelwert, visualisiert mit geom_point()\nein Maß für die Streuung, visualisiert mit “geom_errorbar()”.\n\nfür diesen Kurs werden wir die Standardabweichung verwenden\nAbbildung 7 ist das, was wir heute erzeugen werden\n\n\n\n\n\n\n\nAbbildung 7: Errorbar plot of df_eng (body mass by age_subject)"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#section",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#section",
-    "title": "Datenvisualisierung 3",
-    "section": "",
-    "text": "Wie groß ist die Bandbreite der beobachteten Werte?\n\n\nrange(df_eng$rt_lexdec)\n\n\n\n[1]  495.38 1323.20\n\n\n\nbeachten Sie, dass der tatsächliche Bereich der Datenpunkte und das Balkendiagramm viel “Tinte” für datenfreie (d. h. unbeobachtete) Reaktionszeitwerte verwenden\n\n\n\nAbbildung 9: Balkendiagramm des Mittelwerts mit +/- 1 Standardabweichung (ich empfehle, von solchen Diagrammen abzusehen!)"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkendiagramm-vs.-balkendiagramm-für-mittelwerte",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkendiagramm-vs.-balkendiagramm-für-mittelwerte",
-    "title": "Datenvisualisierung 3",
-    "section": "Fehlerbalkendiagramm vs. Balkendiagramm für Mittelwerte",
-    "text": "Fehlerbalkendiagramm vs. Balkendiagramm für Mittelwerte\n\nAbbildung 10 A und B stellen dieselbe Information dar\n\n\n\nAbbildung 10: Fehlerbalken-Diagramm und Balkendiagramme, die Mittelwerte (+/-1SD) darstellen, sowie ein Histogramm der gleichen Daten"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#gleiche-grenzen-auf-der-y-achse",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#gleiche-grenzen-auf-der-y-achse",
-    "title": "Datenvisualisierung 3",
-    "section": "Gleiche Grenzen auf der y-Achse",
-    "text": "Gleiche Grenzen auf der y-Achse\n\nAbbildung 11 zeigt die gleichen Daten, aber mit dem gleichen y-Achsenbereich\n\n\n\nAbbildung 11: Fehlerbargraphik und Balkenplots, die Mittelwerte (+/-1SD) darstellen, sowie ein Histogramm derselben Daten mit demselben y-Achsenbereich"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#zusammenfassende-statistiken-und-verteilung",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#zusammenfassende-statistiken-und-verteilung",
-    "title": "Datenvisualisierung 3",
-    "section": "Zusammenfassende Statistiken und Verteilung",
-    "text": "Zusammenfassende Statistiken und Verteilung\n\nFehlerbalken allein sind keine Lösung: auch hier wird eine Menge Information verborgen\n\nein guter Grund, die Rohdatenpunkte immer zu visualisieren, unabhängig davon, welche zusammenfassende Darstellung Sie erstellen"
-  },
-  {
-    "objectID": "slides/09-data_viz3/data_viz3_folien.html#hausaufgabe",
-    "href": "slides/09-data_viz3/data_viz3_folien.html#hausaufgabe",
-    "title": "Datenvisualisierung 3",
-    "section": "Hausaufgabe",
-    "text": "Hausaufgabe\nAnhang 8: Datenvisualisierung 3 auf der Website des Kurses."
-  },
-  {
     "objectID": "slides/09-data_viz3/data_viz3_blatt.html",
     "href": "slides/09-data_viz3/data_viz3_blatt.html",
     "title": "Datenvisualisierung 3",
@@ -2868,6 +2259,909 @@
     "crumbs": [
       "D. Palleschi",
       "Datenvisualisierung 3"
+    ]
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#pakete",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#pakete",
+    "title": "Datenvisualisierung 3",
+    "section": "Pakete",
+    "text": "Pakete\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork)"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#daten",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#daten",
+    "title": "Datenvisualisierung 3",
+    "section": "Daten",
+    "text": "Daten\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#boxplot",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#boxplot",
+    "title": "Datenvisualisierung 3",
+    "section": "Boxplot",
+    "text": "Boxplot\n\n\n\nauch bekannt als Box-and-Whisker-Plots, enthalten\n\neine Box\neine Linie in der Mitte der Box\nLinien, die an beiden Enden der Box herausragen (die ‘Whisker’)\nmanchmal Punkte"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkenplots",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkenplots",
+    "title": "Datenvisualisierung 3",
+    "section": "Fehlerbalkenplots",
+    "text": "Fehlerbalkenplots\n\n\n\nDiese Diagramme bestehen aus 2 Teilen:\n\nder Mittelwert, visualisiert mit geom_point()\nein Maß für die Streuung, visualisiert mit “geom_errorbar()”.\n\nfür diesen Kurs werden wir die Standardabweichung verwenden\nAbbildung 7 ist das, was wir heute erzeugen werden\n\n\n\n\n\n\n\nAbbildung 7: Errorbar plot of df_eng (body mass by age_subject)"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#section",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#section",
+    "title": "Datenvisualisierung 3",
+    "section": "",
+    "text": "Wie groß ist die Bandbreite der beobachteten Werte?\n\n\nrange(df_eng$rt_lexdec)\n\n\n\n[1]  495.38 1323.20\n\n\n\nbeachten Sie, dass der tatsächliche Bereich der Datenpunkte und das Balkendiagramm viel “Tinte” für datenfreie (d. h. unbeobachtete) Reaktionszeitwerte verwenden\n\n\n\nAbbildung 9: Balkendiagramm des Mittelwerts mit +/- 1 Standardabweichung (ich empfehle, von solchen Diagrammen abzusehen!)"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkendiagramm-vs.-balkendiagramm-für-mittelwerte",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#fehlerbalkendiagramm-vs.-balkendiagramm-für-mittelwerte",
+    "title": "Datenvisualisierung 3",
+    "section": "Fehlerbalkendiagramm vs. Balkendiagramm für Mittelwerte",
+    "text": "Fehlerbalkendiagramm vs. Balkendiagramm für Mittelwerte\n\nAbbildung 10 A und B stellen dieselbe Information dar\n\n\n\nAbbildung 10: Fehlerbalken-Diagramm und Balkendiagramme, die Mittelwerte (+/-1SD) darstellen, sowie ein Histogramm der gleichen Daten"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#gleiche-grenzen-auf-der-y-achse",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#gleiche-grenzen-auf-der-y-achse",
+    "title": "Datenvisualisierung 3",
+    "section": "Gleiche Grenzen auf der y-Achse",
+    "text": "Gleiche Grenzen auf der y-Achse\n\nAbbildung 11 zeigt die gleichen Daten, aber mit dem gleichen y-Achsenbereich\n\n\n\nAbbildung 11: Fehlerbargraphik und Balkenplots, die Mittelwerte (+/-1SD) darstellen, sowie ein Histogramm derselben Daten mit demselben y-Achsenbereich"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#zusammenfassende-statistiken-und-verteilung",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#zusammenfassende-statistiken-und-verteilung",
+    "title": "Datenvisualisierung 3",
+    "section": "Zusammenfassende Statistiken und Verteilung",
+    "text": "Zusammenfassende Statistiken und Verteilung\n\nFehlerbalken allein sind keine Lösung: auch hier wird eine Menge Information verborgen\n\nein guter Grund, die Rohdatenpunkte immer zu visualisieren, unabhängig davon, welche zusammenfassende Darstellung Sie erstellen"
+  },
+  {
+    "objectID": "slides/09-data_viz3/data_viz3_folien.html#hausaufgabe",
+    "href": "slides/09-data_viz3/data_viz3_folien.html#hausaufgabe",
+    "title": "Datenvisualisierung 3",
+    "section": "Hausaufgabe",
+    "text": "Hausaufgabe\nAnhang 8: Datenvisualisierung 3 auf der Website des Kurses."
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html",
+    "title": "Datenvisualisierung 4",
+    "section": "",
+    "text": "Für weitere Lektüre und Übungen zu diesem Thema empfehle ich die Lektüre von Abschnitt 11.5 (Kommunikation: Themen) in Wickham et al. (2023) und Kapitel 4 (Darstellung von zusammenfassenden Statistiken) in Nordmann et al. (2022)."
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pakete",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pakete",
+    "title": "Datenvisualisierung 4",
+    "section": "Pakete",
+    "text": "Pakete\nHeute laden wir unsere relevanten tidyverse-Pakete direkt: dplyr und ggplot. Dies sind die einzigen Pakete, die uns beim Laden unserer Daten helfen. Wir laden auch das here-Paket und das janitor-Paket, das für das Aufräumen unserer Daten nützlich ist (z.B. die Funktion clean_names()). Um unsere Diagramme anzupassen, verwenden wir auch die Pakete ggthemes und patchwork. Ersteres hilft uns bei der Erstellung von farbenblindenfreundlichen Plots, während letzteres uns erlaubt, mehrere Plots zusammen zu drucken. Wir brauchen auch ein neues Paket: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#daten",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#daten",
+    "title": "Datenvisualisierung 4",
+    "section": "Daten",
+    "text": "Daten\nWir arbeiten wieder mit unserer leicht veränderten Version des english-Datensatzes aus dem Paket languageR.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#hinzufügen-eines-boxplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#hinzufügen-eines-boxplots",
+    "title": "Datenvisualisierung 4",
+    "section": "1.1 Hinzufügen eines Boxplots",
+    "text": "1.1 Hinzufügen eines Boxplots\nWir können auch ein weiteres Geom hinzufügen, um dem Diagramm weitere Informationen hinzuzufügen. Fügen wir einen Boxplot hinzu.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_nudge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_nudge",
+    "title": "Datenvisualisierung 4",
+    "section": "1.2 position_nudge()",
+    "text": "1.2 position_nudge()\nVielleicht wollen wir den Boxplot so verschieben, dass er nicht über den Dichteplots liegt und nicht ganz so breit ist. Wir können dies tun, indem wir position auf position_nudge() und width auf einen Wert kleiner als .75 setzen, was die Standardbreite ist.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_jitter-für-scatterplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_jitter-für-scatterplots",
+    "title": "Datenvisualisierung 4",
+    "section": "1.3 position_jitter() für Scatterplots",
+    "text": "1.3 position_jitter() für Scatterplots\nDies gehört zu einer Familie von Optionen, mit denen man die Position von Geomen verändern kann. Zum Beispiel zeigen Abbildung 4 A und B beide genau die gleichen Daten, aber Abbildung 4 B enthält position = position_jitter(0.2), um überlappende Punkte zu verschieben. Auf diese Weise erhalten wir eine gute Vorstellung davon, wie viele Beobachtungen es über die Reaktionszeiten hinweg gab (y-Achse).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#kombiniert-alle-drei",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#kombiniert-alle-drei",
+    "title": "Datenvisualisierung 4",
+    "section": "1.4 Kombiniert alle drei",
+    "text": "1.4 Kombiniert alle drei\nWenn wir alle diese Diagramme zusammenfügen, erhalten wir eine Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\n\n\n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pivot_longer-summarise",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#pivot_longer-summarise",
+    "title": "Datenvisualisierung 4",
+    "section": "2.1 pivot_longer() |> summarise()",
+    "text": "2.1 pivot_longer() |&gt; summarise()\nLassen Sie uns etwas Ähnliches mit dem Datensatz “Englisch” nachstellen. Zuerst werden wir pivot_longer() verwenden, um unsere Daten zu verlängern, dann erstellen wir eine Zusammenfassung der Reaktionszeiten für die lexikalische Entscheidungsaufgabe und die Benennungsaufgabe pro Altersgruppe.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#überlappende-fehlerbalken",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#überlappende-fehlerbalken",
+    "title": "Datenvisualisierung 4",
+    "section": "2.2 Überlappende Fehlerbalken",
+    "text": "2.2 Überlappende Fehlerbalken\nWenn wir für diese Daten ein Fehlerbalken-Diagramm erstellen, erhalten wir Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\n\n\n\n\nAbbildung 7: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_dodge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#position_dodge",
+    "title": "Datenvisualisierung 4",
+    "section": "2.3 position_dodge()",
+    "text": "2.3 position_dodge()\nWir können position = position_dodge(0.2) hinzufügen, damit sich die Fehlerbalken nicht überlappen. Wir werden auch ihre width anpassen, damit sie nicht so breit sind (jeder Wert unter 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 8: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#ausweichen-vor-allen-relevanten-geomen",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#ausweichen-vor-allen-relevanten-geomen",
+    "title": "Datenvisualisierung 4",
+    "section": "2.4 Ausweichen vor allen relevanten Geomen",
+    "text": "2.4 Ausweichen vor allen relevanten Geomen\nAber jetzt haben wir die Punkte hinter uns gelassen. Wir müssen auch den Punkten ausweichen, also fügen wir position_dodge() zu geom_point() hinzu und stellen sicher, dass wir den gleichen Wert wie bei geom_errorbar() verwenden.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 9: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#standardthemen",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#standardthemen",
+    "title": "Datenvisualisierung 4",
+    "section": "3.1 Standardthemen",
+    "text": "3.1 Standardthemen\nZunächst wurde theme_minimal() zu jedem Plot hinzugefügt, um das allgemeine Aussehen anzupassen. Es gibt eine Vielzahl von benutzerdefinierten Themen, wie theme_bw() oder theme_classic(). Probieren Sie sie aus.\n\n\n\n\n\n\n\n\nAbbildung 11: Preset themes"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#theme",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_DE.html#theme",
+    "title": "Datenvisualisierung 4",
+    "section": "3.2 theme()",
+    "text": "3.2 theme()\nWir können auch einzelne Komponenten des Themas steuern, indem wir Anpassungen mit theme() hinzufügen. Zum Beispiel sehen wir in Abbildung 10 A, dass die Achsentitel fett gedruckt sind. Dies wurde durch Hinzufügen von theme(axis.title = element_text(face = \"bold)) erreicht, wobei axis.title = anzeigt, dass wir eine Änderung an den Achsentiteln vornehmen wollen, element_text() zeigt an, dass es ihr Text ist, den wir ändern wollen, und face = \"bold\" zeigt an, dass wir den Text fett machen wollen. Dasselbe wurde für legend.title = gemacht, um den Titel der Legende fett zu machen.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\n\nAbbildung 12: Using theme()"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pakete",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pakete",
+    "title": "Datenvisualisierung 4",
+    "section": "Pakete",
+    "text": "Pakete\nHeute laden wir unsere relevanten tidyverse-Pakete direkt: dplyr und ggplot. Dies sind die einzigen Pakete, die uns beim Laden unserer Daten helfen. Wir laden auch das here-Paket und das janitor-Paket, das für das Aufräumen unserer Daten nützlich ist (z.B. die Funktion clean_names()). Um unsere Diagramme anzupassen, verwenden wir auch die Pakete ggthemes und patchwork. Ersteres hilft uns bei der Erstellung von farbenblindenfreundlichen Plots, während letzteres uns erlaubt, mehrere Plots zusammen zu drucken. Wir brauchen auch ein neues Paket: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#daten",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#daten",
+    "title": "Datenvisualisierung 4",
+    "section": "Daten",
+    "text": "Daten\nWir arbeiten wieder mit unserer leicht veränderten Version des english-Datensatzes aus dem Paket languageR.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#hinzufügen-eines-boxplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#hinzufügen-eines-boxplots",
+    "title": "Datenvisualisierung 4",
+    "section": "Hinzufügen eines Boxplots",
+    "text": "Hinzufügen eines Boxplots\nWir können auch ein weiteres Geom hinzufügen, um dem Diagramm weitere Informationen hinzuzufügen. Fügen wir einen Boxplot hinzu.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_nudge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_nudge",
+    "title": "Datenvisualisierung 4",
+    "section": "position_nudge()",
+    "text": "position_nudge()\nVielleicht wollen wir den Boxplot so verschieben, dass er nicht über den Dichteplots liegt und nicht ganz so breit ist. Wir können dies tun, indem wir position auf position_nudge() und width auf einen Wert kleiner als .75 setzen, was die Standardbreite ist.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_jitter-für-scatterplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_jitter-für-scatterplots",
+    "title": "Datenvisualisierung 4",
+    "section": "position_jitter() für Scatterplots",
+    "text": "position_jitter() für Scatterplots\nDies gehört zu einer Familie von Optionen, mit denen man die Position von Geomen verändern kann. Zum Beispiel zeigen Abbildung 4 A und B beide genau die gleichen Daten, aber Abbildung 4 B enthält position = position_jitter(0.2), um überlappende Punkte zu verschieben. Auf diese Weise erhalten wir eine gute Vorstellung davon, wie viele Beobachtungen es über die Reaktionszeiten hinweg gab (y-Achse).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#kombiniert-alle-drei",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#kombiniert-alle-drei",
+    "title": "Datenvisualisierung 4",
+    "section": "Kombiniert alle drei",
+    "text": "Kombiniert alle drei\nWenn wir alle diese Diagramme zusammenfügen, erhalten wir eine Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pivot_longer-summarise",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#pivot_longer-summarise",
+    "title": "Datenvisualisierung 4",
+    "section": "pivot_longer() |> summarise()",
+    "text": "pivot_longer() |&gt; summarise()\nLassen Sie uns etwas Ähnliches mit dem Datensatz “Englisch” nachstellen. Zuerst werden wir pivot_longer() verwenden, um unsere Daten zu verlängern, dann erstellen wir eine Zusammenfassung der Reaktionszeiten für die lexikalische Entscheidungsaufgabe und die Benennungsaufgabe pro Altersgruppe.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#überlappende-fehlerbalken",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#überlappende-fehlerbalken",
+    "title": "Datenvisualisierung 4",
+    "section": "Überlappende Fehlerbalken",
+    "text": "Überlappende Fehlerbalken\nWenn wir für diese Daten ein Fehlerbalken-Diagramm erstellen, erhalten wir Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\nAbbildung 7: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_dodge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#position_dodge",
+    "title": "Datenvisualisierung 4",
+    "section": "position_dodge()",
+    "text": "position_dodge()\nWir können position = position_dodge(0.2) hinzufügen, damit sich die Fehlerbalken nicht überlappen. Wir werden auch ihre width anpassen, damit sie nicht so breit sind (jeder Wert unter 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 8: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#ausweichen-vor-allen-relevanten-geomen",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#ausweichen-vor-allen-relevanten-geomen",
+    "title": "Datenvisualisierung 4",
+    "section": "Ausweichen vor allen relevanten Geomen",
+    "text": "Ausweichen vor allen relevanten Geomen\nAber jetzt haben wir die Punkte hinter uns gelassen. Wir müssen auch den Punkten ausweichen, also fügen wir position_dodge() zu geom_point() hinzu und stellen sicher, dass wir den gleichen Wert wie bei geom_errorbar() verwenden.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 9: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#standardthemen",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#standardthemen",
+    "title": "Datenvisualisierung 4",
+    "section": "Standardthemen",
+    "text": "Standardthemen\nZunächst wurde theme_minimal() zu jedem Plot hinzugefügt, um das allgemeine Aussehen anzupassen. Es gibt eine Vielzahl von benutzerdefinierten Themen, wie theme_bw() oder theme_classic(). Probieren Sie sie aus.\n\n\nAbbildung 11: Preset themes"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#theme",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_DE.html#theme",
+    "title": "Datenvisualisierung 4",
+    "section": "theme()",
+    "text": "theme()\nWir können auch einzelne Komponenten des Themas steuern, indem wir Anpassungen mit theme() hinzufügen. Zum Beispiel sehen wir in Abbildung 10 A, dass die Achsentitel fett gedruckt sind. Dies wurde durch Hinzufügen von theme(axis.title = element_text(face = \"bold)) erreicht, wobei axis.title = anzeigt, dass wir eine Änderung an den Achsentiteln vornehmen wollen, element_text() zeigt an, dass es ihr Text ist, den wir ändern wollen, und face = \"bold\" zeigt an, dass wir den Text fett machen wollen. Dasselbe wurde für legend.title = gemacht, um den Titel der Legende fett zu machen.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\nAbbildung 12: Using theme()"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html",
+    "title": "Troubleshooting",
+    "section": "",
+    "text": "In diesem Abschnitt werden wir lernen\n\nwie man mit allgemeinen Warnungen und Fehlermeldungen umgeht\nwie man Fehler beim Rendern von Quarto-Skripten behebt\nwo man Hilfe findet, wenn man mit fehlerhaftem Code nicht weiterkommt"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#paket-angeben",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#paket-angeben",
+    "title": "Troubleshooting",
+    "section": "1.1 Paket angeben",
+    "text": "1.1 Paket angeben\n\nwir müssen angeben, dass sie aus dem Paket pacman stammt\n\noder wir könnten dieser Zeile library(pacman) voranstellen\n\n\n\npacman::p_load(tidyverse,\n               janitor,\n               here,\n               languageR)"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#syntaxfehler",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#syntaxfehler",
+    "title": "Troubleshooting",
+    "section": "2.1 Syntaxfehler",
+    "text": "2.1 Syntaxfehler\n\nSyntaxfehler beziehen sich auf Fehler aufgrund von ungültigem Code\n\nam häufigsten fehlende Komma oder Klammer\nTippfehler bei Funktions-, Objekt- oder Variablennamen\n\n\n\n2.1.1 fehlende Zeichensetzung\n\nwas ist das Problem mit diesem Code?\n\n\nlexdec[c(\"Subject\", \"RT\", \"Correct\"]\n\nError: &lt;text&gt;:1:36: unexpected ']'\n1: lexdec[c(\"Subject\", \"RT\", \"Correct\"]\n                                       ^\n\n\n\n\n2.1.2 Typfehler\n\nwas ist das Problem mit diesem Code?\n\n\nlexdec[c(\"Subject\", \"rt\", \"Correct\")]\n\nError in `[.data.frame`(lexdec, c(\"Subject\", \"rt\", \"Correct\")): undefined columns selected\n\n\n\n\n2.1.3 Tidyverse-Meldungen\n\ndas Tidyverse hat normaleweise sehr informative Meldungen\n\n\nlexdec |&gt; \n  select(\"Subjct\", \"RT\", \"Correct\")\n\nError in `select()`:\n! Can't select columns that don't exist.\n✖ Column `Subjct` doesn't exist.\n\n\n\nHier wird uns genau gesagt, wo das Problem liegt: Wir haben keine Variable namens Subjct\n\n\nlexdec |&gt; \n  select(\"subject\", \"RT\", \"Correct\")\n\nError in `select()`:\n! Can't select columns that don't exist.\n✖ Column `subject` doesn't exist.\n\n\n\nDieses Mal ist der Tippfehler auf die Groß- und Kleinschreibung zurückzuführen, denn unsere Variable Subjekt beginnt mit einem großen S\n\n\n\n2.1.4 häufige Syntaxfehler\nEinige häufige Syntaxfehler sind:\n\nfalsche Großschreibung (z.B. Lexdec$Subject statt lexdec$Subject)\nTippfehler (z. B. Länge(lexdec) statt Länge(lexdec))\nschließende Interpunktion, wie z. B. ein schließendes Anführungszeichen, eine Klammer oder eine eckige Klammer\nfortgesetzte Interpunktion, typischerweise fehlt ein Komma oder eine Pipe\n\n\n\n\n\n\n\n\n\nAbbildung 2: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rstudio-syntax-checker",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rstudio-syntax-checker",
+    "title": "Troubleshooting",
+    "section": "2.2 RStudio-Syntax-Checker",
+    "text": "2.2 RStudio-Syntax-Checker\n\nRStudio erkennt in der Regel Syntaxfehler und teilt Ihnen vor der Ausführung Ihres Codes mit, ob Sie etwas übersehen haben. Das folgende Code-Stück gibt zum Beispiel eine Fehlermeldung aus.\n\n\nlexdec[c(\"Subject\", \"RT\" \"Correct\")]\n\nError: &lt;text&gt;:1:26: unexpected string constant\n1: lexdec[c(\"Subject\", \"RT\" \"Correct\"\n                             ^\n\n\n\nWir sehen ein rotes “X” neben der Zeilennummer (42) sowie eine rote Unterstreichung für den problematischen oder unerwarteten Code.\n\n\n\n\n\n\n\n\n\nAbbildung 3: RStudio-Syntaxfehler-Warnung"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#section",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#section",
+    "title": "Troubleshooting",
+    "section": "",
+    "text": "Abbildung 4: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#eval-false",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#eval-false",
+    "title": "Troubleshooting",
+    "section": "3.1 eval: false",
+    "text": "3.1 eval: false\n\nDer erste Codeabschnitt in Abbildung 5 enthält die Option eval: false, und wird daher beim Rendern des Skripts nicht ausgeführt\nDer zweite Codeabschnitt versucht dann, die ersten 6 Zeilen des Datensatzes lexdec zu drucken, der Teil des Pakets languageR ist\ndaher wird das Objekt 'lexdec' nicht gefunden.\nDies ist insofern informativ: es sagt uns nicht explizit, dass es daran liegt, dass wir das Paket nicht geladen haben\n\nBei solchen Fehlern müssen wir manchmal nachforschen, indem wir unseren Code untersuchen."
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#code-zeilen-und-chunk-nummern",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#code-zeilen-und-chunk-nummern",
+    "title": "Troubleshooting",
+    "section": "3.2 Code-Zeilen und Chunk-Nummern",
+    "text": "3.2 Code-Zeilen und Chunk-Nummern\n\nvielleicht haben wir ein sehr langes Skript geschrieben und es ist nicht klar, wo die Quelle des Problems liegt, wenn wir nur den Fehlertext betrachten\n\nwir erhalten auch Informationen darüber, wo Quarto auf ein Problem gestoßen ist: Qutting from lines 11-12 [unnamed-chunk-2] (Untitled.qmd)"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects",
+    "title": "Troubleshooting",
+    "section": "3.3 RProjects",
+    "text": "3.3 RProjects\n\n\n\n\n\n\n\n\nAbbildung 6: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-1",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-1",
+    "title": "Troubleshooting",
+    "section": "RProjects",
+    "text": "RProjects\n\nAbbildung 6: \"Users/danielapalleschi/daten/langaugeR_english.csv\" existiert nicht\n\nDiese Aussage ist richtig, da dieser Dateipfad auf meinem Rechner tatsächlich nicht existiert\n\nBeachten Sie, dass oben in der Mitte des Bildes “RStudio” steht und rechts daneben “Project: (None)”\n\nwir arbeiten nicht innerhalb eines RProjekts"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-2",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#rprojects-2",
+    "title": "Troubleshooting",
+    "section": "RProjects",
+    "text": "RProjects\n\ndas gleiche Skript wird ohne Warnung ausgeführt, und Sie können sehen, dass wir innerhalb eines RProjekts mit dem Namen r4ling arbeiten\n\nund die csv-Datei wird ohne Warnung geladen\n\n\n\n\n\n\n\n\n\n\nAbbildung 7: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#google",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#google",
+    "title": "Troubleshooting",
+    "section": "4.1 Google",
+    "text": "4.1 Google\n\nIm Zweifelsfall: Google!\n\nMöglicherweise finden Sie einige Blogbeiträge oder Forenbeiträge, in denen das Problem und mögliche Lösungen diskutiert werden\n\nDies ist ein guter erster Schritt, um das Problem zu lösen."
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#stackoverflow",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#stackoverflow",
+    "title": "Troubleshooting",
+    "section": "4.2 Stackoverflow",
+    "text": "4.2 Stackoverflow\n\neine Online-Community für Entwickler mit vielen Forenbeiträgen zu R-Programmierproblemen\nIn der Regel finden Sie einen Thread, in dem jemand das gleiche Problem hatte wie Sie, und mehrere andere antworten mit möglichen Lösungen\nWenn Sie wirklich nicht weiterkommen, können Sie sogar Ihre eigene Frage stellen! Dazu müssen Sie ein Konto erstellen"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#dokumentation",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#dokumentation",
+    "title": "Troubleshooting",
+    "section": "4.3 Dokumentation",
+    "text": "4.3 Dokumentation\n\nes gibt eine Fülle von Dokumentationen für Pakete (und Funktionen)\nin der Console: ?Paket oder ?Funktion"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#chatgpt",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_blatt_DE.html#chatgpt",
+    "title": "Troubleshooting",
+    "section": "4.4 ChatGPT",
+    "text": "4.4 ChatGPT\n\nChatbots work best for small, discrete programming tasks, such as loading data, performing basic data manipulations and creating visualizations and websites.\n— Perkel (2023)\n\n\nWenn Sie ChatGPT Ihre Fehlermeldung oder sogar den problematischen Code geben, können Sie eine schnelle Erklärung des Problems und eine Lösung finden\n\nDies kann ein wertvolles Lernmittel sein\n\n\n\n4.4.1 ChatGPT: Vorsicht\n\nChatGPT wird Ihnen zum Beispiel nicht sagen können, dass Sie einen Variablennamen mit Kamelhülsen geschrieben haben (cameCaseLooksLikeThis), wenn Ihre Variablen mit Schlangenhülsen benannt sind (snake_case_looks_like_this)\n\noder wenn es einen anderen Tippfehler gibt, der nichts mit der Syntax zu tun hat\n\nWenn Sie in der Lage sind, Fehler-/Warnmeldungen zu interpretieren und die Ursache des Problems ausfindig zu machen, ist das der schnellste Weg zur Lösung.\n\n\n\n\n\n\nThe temptation to copy and paste code snippets from ChatGPT or Stackoverflow is real, but true mastery lies in comprehension. I've copied and pasted a lot of code. But as a programmer, it's your duty to understand. And to do so, you'll eventually end up in documentation 😉. pic.twitter.com/HWi09tPz6O\n\n— Travis Oliphant ((teoliphant?)) October 20, 2023\n\n\n\n\n4.4.2 ChatGPT: Vertrauen, aber überprüfen\n\nes ist wichtig zu wissen, dass ChatGPT ein Tausendsassa ist, der nichts beherrscht\n“Vertrauen, aber überprüfen” (Perkel, 2023)\n\nVertrauen Sie nicht blind auf das, was die KI Ihnen sagt\n\nSeien Sie also skeptisch gegenüber den Lösungen, die ChatGPT Ihnen anbietet, vor allem, wenn Ihre Probleme komplexer werden\nTesten Sie immer, ob der vorgeschlagene Code nicht nur ohne eine weitere Warnung oder Fehlermeldung läuft, sondern ob er auch das erreicht, was Sie erwarten\n\n\n\n4.4.3 \n\n\n\n\n\n\nDisclaimer\n\n\n\n\nChatGPT und Datenschutz: Alles, was Sie in ChatGPT eingeben, wird an die Server von OpenAI gesendet und kann für Trainingszwecke verwendet werden. Geben Sie niemals sensible Informationen in ChatGPT ein.\nChatGPT und akademische Integrität: Schauen Sie sich unbedingt die Empfehlungen für das Umgehen mit Künstlicher Intelligenz in Prüfungen der Humboldt-Universität an\nAktualität: Darüber hinaus werden LLM (Large Language Models) auf Daten trainiert, die aktuell sein können oder auch nicht\n\nzum Beispiel wird ChatGPT vielleicht nicht auf der neuesten Version eines Pakets trainiert und ist sich daher möglicherweise der Probleme mit einem veralteten Argument nicht bewusst\n\nEthik der KI: weiteres, allgemeineres Problem bei der Verwendung von ChatGPT oder einem anderen LMM (Large Language Model)\n\nis es ethisch vertretbar, sich zu sehr auf künstliche Intelligenz zu verlassen, bei der wiederholt festgestellt wurde, dass sie rassische und geschlechtsspezifische Vorurteile hat?"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#paket-angeben",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#paket-angeben",
+    "title": "Troubleshooting",
+    "section": "Paket angeben",
+    "text": "Paket angeben\n\nwir müssen angeben, dass sie aus dem Paket pacman stammt\n\noder wir könnten dieser Zeile library(pacman) voranstellen\n\n\n\npacman::p_load(tidyverse,\n               janitor,\n               here,\n               languageR)"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#syntaxfehler",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#syntaxfehler",
+    "title": "Troubleshooting",
+    "section": "Syntaxfehler",
+    "text": "Syntaxfehler\n\nSyntaxfehler beziehen sich auf Fehler aufgrund von ungültigem Code\n\nam häufigsten fehlende Komma oder Klammer\nTippfehler bei Funktions-, Objekt- oder Variablennamen"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rstudio-syntax-checker",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rstudio-syntax-checker",
+    "title": "Troubleshooting",
+    "section": "RStudio-Syntax-Checker",
+    "text": "RStudio-Syntax-Checker\n\nRStudio erkennt in der Regel Syntaxfehler und teilt Ihnen vor der Ausführung Ihres Codes mit, ob Sie etwas übersehen haben. Das folgende Code-Stück gibt zum Beispiel eine Fehlermeldung aus.\n\n\nlexdec[c(\"Subject\", \"RT\" \"Correct\")]\n\n\n\nError: &lt;text&gt;:1:26: unexpected string constant\n1: lexdec[c(\"Subject\", \"RT\" \"Correct\"\n                             ^\n\n\n\nWir sehen ein rotes “X” neben der Zeilennummer (42) sowie eine rote Unterstreichung für den problematischen oder unerwarteten Code.\n\n\n\nAbbildung 3: RStudio-Syntaxfehler-Warnung"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#section",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#section",
+    "title": "Troubleshooting",
+    "section": "",
+    "text": "Abbildung 4: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#eval-false",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#eval-false",
+    "title": "Troubleshooting",
+    "section": "eval: false",
+    "text": "eval: false\n\nDer erste Codeabschnitt in Abbildung 5 enthält die Option eval: false, und wird daher beim Rendern des Skripts nicht ausgeführt\nDer zweite Codeabschnitt versucht dann, die ersten 6 Zeilen des Datensatzes lexdec zu drucken, der Teil des Pakets languageR ist\ndaher wird das Objekt 'lexdec' nicht gefunden.\nDies ist insofern informativ: es sagt uns nicht explizit, dass es daran liegt, dass wir das Paket nicht geladen haben\n\nBei solchen Fehlern müssen wir manchmal nachforschen, indem wir unseren Code untersuchen."
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#code-zeilen-und-chunk-nummern",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#code-zeilen-und-chunk-nummern",
+    "title": "Troubleshooting",
+    "section": "Code-Zeilen und Chunk-Nummern",
+    "text": "Code-Zeilen und Chunk-Nummern\n\nvielleicht haben wir ein sehr langes Skript geschrieben und es ist nicht klar, wo die Quelle des Problems liegt, wenn wir nur den Fehlertext betrachten\n\nwir erhalten auch Informationen darüber, wo Quarto auf ein Problem gestoßen ist: Qutting from lines 11-12 [unnamed-chunk-2] (Untitled.qmd)"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects",
+    "title": "Troubleshooting",
+    "section": "RProjects",
+    "text": "RProjects\n\n\nAbbildung 6: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-1",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-1",
+    "title": "Troubleshooting",
+    "section": "RProjects",
+    "text": "RProjects\n\nAbbildung 6: \"Users/danielapalleschi/daten/langaugeR_english.csv\" existiert nicht\n\nDiese Aussage ist richtig, da dieser Dateipfad auf meinem Rechner tatsächlich nicht existiert\n\nBeachten Sie, dass oben in der Mitte des Bildes “RStudio” steht und rechts daneben “Project: (None)”\n\nwir arbeiten nicht innerhalb eines RProjekts"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-2",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#rprojects-2",
+    "title": "Troubleshooting",
+    "section": "RProjects",
+    "text": "RProjects\n\ndas gleiche Skript wird ohne Warnung ausgeführt, und Sie können sehen, dass wir innerhalb eines RProjekts mit dem Namen r4ling arbeiten\n\nund die csv-Datei wird ohne Warnung geladen\n\n\n\n\nAbbildung 7: Kunstwerke von Alison Horst"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#google",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#google",
+    "title": "Troubleshooting",
+    "section": "Google",
+    "text": "Google\n\nIm Zweifelsfall: Google!\n\nMöglicherweise finden Sie einige Blogbeiträge oder Forenbeiträge, in denen das Problem und mögliche Lösungen diskutiert werden\n\nDies ist ein guter erster Schritt, um das Problem zu lösen."
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#stackoverflow",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#stackoverflow",
+    "title": "Troubleshooting",
+    "section": "Stackoverflow",
+    "text": "Stackoverflow\n\neine Online-Community für Entwickler mit vielen Forenbeiträgen zu R-Programmierproblemen\nIn der Regel finden Sie einen Thread, in dem jemand das gleiche Problem hatte wie Sie, und mehrere andere antworten mit möglichen Lösungen\nWenn Sie wirklich nicht weiterkommen, können Sie sogar Ihre eigene Frage stellen! Dazu müssen Sie ein Konto erstellen"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#dokumentation",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#dokumentation",
+    "title": "Troubleshooting",
+    "section": "Dokumentation",
+    "text": "Dokumentation\n\nes gibt eine Fülle von Dokumentationen für Pakete (und Funktionen)\nin der Console: ?Paket oder ?Funktion"
+  },
+  {
+    "objectID": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#chatgpt",
+    "href": "slides_upcoming/15-troubleshooting/troubleshooting_folien_DE.html#chatgpt",
+    "title": "Troubleshooting",
+    "section": "ChatGPT",
+    "text": "ChatGPT\n\nChatbots work best for small, discrete programming tasks, such as loading data, performing basic data manipulations and creating visualizations and websites.\n— Perkel (2023)\n\n\nWenn Sie ChatGPT Ihre Fehlermeldung oder sogar den problematischen Code geben, können Sie eine schnelle Erklärung des Problems und eine Lösung finden\n\nDies kann ein wertvolles Lernmittel sein"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#packages",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#packages",
+    "title": "Datenvisualisierung 4",
+    "section": "Packages",
+    "text": "Packages\nToday, we’re loading our relevant tidyverse packages directly: dplyr and ggplot. These are the only To aid us in loading in our data, we’re also loading the here package, and the janitor package which is useful for tidying up our data (e.g., the clean_names() function). To customise our plots we’re also using the ggthemes and patchwork packages. The former helps us produce plots that are colour-blind friendly, while the latter allows us to print multiple plots together. We also need a new package: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#data",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#data",
+    "title": "Datenvisualisierung 4",
+    "section": "Data",
+    "text": "Data\nWe’re again working with our slightly altered version of the english dataset from the languageR package.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#adding-a-boxplot",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#adding-a-boxplot",
+    "title": "Datenvisualisierung 4",
+    "section": "Adding a boxplot",
+    "text": "Adding a boxplot\nWe can also add another geom to add more information to the plot. Let’s add a boxplot.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_nudge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_nudge",
+    "title": "Datenvisualisierung 4",
+    "section": "position_nudge()",
+    "text": "position_nudge()\nMaybe we want to move the boxplot so that it’s not overtop of the density plots, and so that it’s not quite as wide. We can do this by setting position to position_nudge(), and width to some value smaller than .75, which is the default width.\n\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_jitter-for-scatterplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_jitter-for-scatterplots",
+    "title": "Datenvisualisierung 4",
+    "section": "position_jitter() for scatterplots",
+    "text": "position_jitter() for scatterplots\nThis is from a family of options that allow us to alter the position of geoms. For example, Abbildung 4 A and B both show the exact same data, but Abbildung 4 B includes position = position_jitter(0.2) to move overlapping points. This way we get a good idea of how many observations there were across reaction times (y-axis).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#combining-all-three",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#combining-all-three",
+    "title": "Datenvisualisierung 4",
+    "section": "Combining all three",
+    "text": "Combining all three\nIf we put all of these plots together, we get a Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#pivot_longer-summarise",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#pivot_longer-summarise",
+    "title": "Datenvisualisierung 4",
+    "section": "pivot_longer() |> summarise()",
+    "text": "pivot_longer() |&gt; summarise()\nLet’s reproduce something similar using the english dataset. First, we’ll use pivot_longer() to lengthen our data, then we’ll create a summary of reaction times for the lexical decision task and naming task per age group.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#overlapping-errorbars",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#overlapping-errorbars",
+    "title": "Datenvisualisierung 4",
+    "section": "Overlapping errorbars",
+    "text": "Overlapping errorbars\nIf we create an errorbar plot of this data, we get Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\nAbbildung 7: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_dodge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#position_dodge",
+    "title": "Datenvisualisierung 4",
+    "section": "position_dodge()",
+    "text": "position_dodge()\nWe can add position = position_dodge(0.2) to force the errorbars to not overlap. We’ll also adjust their width so they’re not so wide (any value lower than 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 8: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#dodging-all-relevant-geoms",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#dodging-all-relevant-geoms",
+    "title": "Datenvisualisierung 4",
+    "section": "dodging all relevant geoms",
+    "text": "dodging all relevant geoms\nBut now we’ve left the points behind. We need to also dodge the points, so we add position_dodge() to geom_point(), making sure to use the same value as we did with geom_errorbar().\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\nAbbildung 9: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#default-themes",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#default-themes",
+    "title": "Datenvisualisierung 4",
+    "section": "Default themes",
+    "text": "Default themes\nFirstly, theme_minimal() was added to each plot to customise the general look. There are a variety of custom themes to try, like theme_bw() or theme_classic(). Try them out.\n\n\nAbbildung 11: Preset themes"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#theme",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_folien_EN.html#theme",
+    "title": "Datenvisualisierung 4",
+    "section": "theme()",
+    "text": "theme()\nWe can also control individual components of theme by adding customisations with theme(). For example we see in Abbildung 10 A the axis titles are bolded. This was achieved by adding theme(axis.title = element_text(face = \"bold)), where axis.title = indicates we want to make a change to the axis titles, element_text() indicates it’s their text that we want to change, and face = \"bold\" indicates we want to make the text bold. The same was done for legend.title = to make the legend title bold.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\nAbbildung 12: Using theme()"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html",
+    "title": "Datenvisualisierung 4",
+    "section": "",
+    "text": "For further reading and practice on this topic, I suggest reading Section 11.5 (Communication: Themes) in Wickham et al. (2023), and Chapter 4 (Representing summary statistics) in Nordmann et al. (2022)."
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#packages",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#packages",
+    "title": "Datenvisualisierung 4",
+    "section": "Packages",
+    "text": "Packages\nToday, we’re loading our relevant tidyverse packages directly: dplyr and ggplot. These are the only To aid us in loading in our data, we’re also loading the here package, and the janitor package which is useful for tidying up our data (e.g., the clean_names() function). To customise our plots we’re also using the ggthemes and patchwork packages. The former helps us produce plots that are colour-blind friendly, while the latter allows us to print multiple plots together. We also need a new package: gghalves.\n\npacman::p_load(tidyverse,\n               here,\n               janitor,\n               ggthemes,\n               patchwork,\n               gghalves\n               )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#data",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#data",
+    "title": "Datenvisualisierung 4",
+    "section": "Data",
+    "text": "Data\nWe’re again working with our slightly altered version of the english dataset from the languageR package.\n\ndf_eng &lt;- read_csv(\n  here(\n    \"daten\",\n    \"languageR_english.csv\"\n  )\n) |&gt; \n  clean_names() |&gt; \n  rename(\n    rt_lexdec = r_tlexdec,\n    rt_naming = r_tnaming\n  )"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#adding-a-boxplot",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#adding-a-boxplot",
+    "title": "Datenvisualisierung 4",
+    "section": "1.1 Adding a boxplot",
+    "text": "1.1 Adding a boxplot\nWe can also add another geom to add more information to the plot. Let’s add a boxplot.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot()\n\n\n\n\n\n\n\nAbbildung 2: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_nudge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_nudge",
+    "title": "Datenvisualisierung 4",
+    "section": "1.2 position_nudge()",
+    "text": "1.2 position_nudge()\nMaybe we want to move the boxplot so that it’s not overtop of the density plots, and so that it’s not quite as wide. We can do this by setting position to position_nudge(), and width to some value smaller than .75, which is the default width.\n\ndf_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_half_violin(alpha = .8) +\n  geom_boxplot(width = .3, # make less wide\n               position = position_nudge(x=0.2)\n               )\n\n\n\n\n\n\n\nAbbildung 3: Boxplot on top of our dodged density plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_jitter-for-scatterplots",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_jitter-for-scatterplots",
+    "title": "Datenvisualisierung 4",
+    "section": "1.3 position_jitter() for scatterplots",
+    "text": "1.3 position_jitter() for scatterplots\nThis is from a family of options that allow us to alter the position of geoms. For example, Abbildung 4 A and B both show the exact same data, but Abbildung 4 B includes position = position_jitter(0.2) to move overlapping points. This way we get a good idea of how many observations there were across reaction times (y-axis).\n\n\nCode\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point() +\n  labs(title = \"geom_point()\") +\ndf_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2)+\n  labs(title = \"geom_point(position = position_jitter(0.2))\") +\n  \n  plot_annotation(tag_levels = \"A\")\n\n\n\n\n\n\n\n\nAbbildung 4: Plotting points along a categorical variable without (A) and with (B) position = position_jitter(0.2). Plot B also includes alpha = 0.2"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#combining-all-three",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#combining-all-three",
+    "title": "Datenvisualisierung 4",
+    "section": "1.4 Combining all three",
+    "text": "1.4 Combining all three\nIf we put all of these plots together, we get a Abbildung 5.\n\n\nCode\nfig_no_colour &lt;-\n  df_eng %&gt;% \n  ggplot() +\n  aes(x = age_subject, y = rt_lexdec) +\n  geom_point(position = position_jitter(0.2),\n             alpha = 0.2) +\n  geom_half_violin() +\n  geom_boxplot(\n    outlier.shape = NA,\n               width = .3, \n               position = position_nudge(x=0.2)) \n\n\n\n\n\n\n\n\n\n\nAbbildung 5: Density, boxplot, scatterplot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#pivot_longer-summarise",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#pivot_longer-summarise",
+    "title": "Datenvisualisierung 4",
+    "section": "2.1 pivot_longer() |> summarise()",
+    "text": "2.1 pivot_longer() |&gt; summarise()\nLet’s reproduce something similar using the english dataset. First, we’ll use pivot_longer() to lengthen our data, then we’ll create a summary of reaction times for the lexical decision task and naming task per age group.\n\nsum_eng &lt;-\n  df_eng |&gt; \n  pivot_longer(\n    cols = c(rt_lexdec, rt_naming),\n    names_to = \"task\",\n    values_to = \"rt\"\n  ) |&gt; \n  summarise(\n    mean = mean(rt, na.rm = T),\n    sd = sd(rt, na.rm = T),\n    .by = c(age_subject, task)\n  ) |&gt; \n  mutate(age_subject = factor(age_subject, levels = c(\"young\", \"old\")))"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#overlapping-errorbars",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#overlapping-errorbars",
+    "title": "Datenvisualisierung 4",
+    "section": "2.2 Overlapping errorbars",
+    "text": "2.2 Overlapping errorbars\nIf we create an errorbar plot of this data, we get Abbildung 7.\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd))\n\n\n\n\n\n\n\nAbbildung 7: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_dodge",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#position_dodge",
+    "title": "Datenvisualisierung 4",
+    "section": "2.3 position_dodge()",
+    "text": "2.3 position_dodge()\nWe can add position = position_dodge(0.2) to force the errorbars to not overlap. We’ll also adjust their width so they’re not so wide (any value lower than 0.75).\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point() +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 8: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#dodging-all-relevant-geoms",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#dodging-all-relevant-geoms",
+    "title": "Datenvisualisierung 4",
+    "section": "2.4 dodging all relevant geoms",
+    "text": "2.4 dodging all relevant geoms\nBut now we’ve left the points behind. We need to also dodge the points, so we add position_dodge() to geom_point(), making sure to use the same value as we did with geom_errorbar().\n\nsum_eng |&gt; \n  ggplot() +\n  aes(x = age_subject, y = mean, colour = task, shape = task) +\n  geom_point(position = position_dodge(0.2)) +\n  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd),\n                position = position_dodge(0.2),\n                width = 0.2)\n\n\n\n\n\n\n\nAbbildung 9: Overlapping errorbar plot"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#default-themes",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#default-themes",
+    "title": "Datenvisualisierung 4",
+    "section": "3.1 Default themes",
+    "text": "3.1 Default themes\nFirstly, theme_minimal() was added to each plot to customise the general look. There are a variety of custom themes to try, like theme_bw() or theme_classic(). Try them out.\n\n\n\n\n\n\n\n\nAbbildung 11: Preset themes"
+  },
+  {
+    "objectID": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#theme",
+    "href": "slides_upcoming/13-dataviz4/data_viz4_blatt_EN.html#theme",
+    "title": "Datenvisualisierung 4",
+    "section": "3.2 theme()",
+    "text": "3.2 theme()\nWe can also control individual components of theme by adding customisations with theme(). For example we see in Abbildung 10 A the axis titles are bolded. This was achieved by adding theme(axis.title = element_text(face = \"bold)), where axis.title = indicates we want to make a change to the axis titles, element_text() indicates it’s their text that we want to change, and face = \"bold\" indicates we want to make the text bold. The same was done for legend.title = to make the legend title bold.\n\nfig_no_colour + theme_minimal() + \n  theme(\n    axis.title = element_text(face = \"italic\")\n    )\n\n\n\n\n\n\n\nAbbildung 12: Using theme()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\n\nVorwort\nDieses Web-Book enthält Folien für die Vorlesung ‘Angewandte Datenverarbeitung und Visualisierung’ im Sommersemester 2024: R für Linguistik und Sozialwissenschaften’ (und andere Iterationen) und begleiten das Web-Book Angewandte Datenverarbeitung und Visualisierung von Daniela Palleschi an der Humboldt-Universität zu Berlin. Die Materialien sind lose an die Materialien von Wickham et al. (2023) angelehnt, wobei alle Beispieldaten durch linguistische Datensätze ersetzt wurden. Das Thema der Woche ist in der Seitenleiste in chronologischer Reihenfolge aufgeführt. Es sind drei Ausgabeformate verfügbar, die alle den gleichen Inhalt haben:\n\nHTML-Seite\nPDF des Inhalts\nRevealJS-Folien (optimal formatiert)\n\nDie Inhalte wurden für die Folienausgabe formatiert. Tabellen und Abbildungen können in den Formaten 1 und 2 zu groß/klein sein. Auf der HTML-Seite können die anderen beiden Formate durch Anklicken des Symbols unter “Andere Formate” (unten in der rechten Seitenleiste) angezeigt werden.\n\n\n\n\n\n\n\nReferences\n\nWickham, H., Çetinkaya-Rundel, M., & Grolemund, G. (2023). R for Data Science (2nd ed.)."
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#ressourcen",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#ressourcen",
+    "title": "Data Wrangling 2",
+    "section": "Ressourcen",
+    "text": "Ressourcen\nDie vorgeschlagenen Ressourcen für dieses Thema sind\n\nKurs-Website: Kapitel 9 (Data Wrangling 2)\nKapitel 6 (Data Tidying) in Wickham et al. (2023)\nKapitel 8 (Data Tidying) in Nordmann & DeBruine (2022)"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#pakete",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#pakete",
+    "title": "Data Wrangling 2",
+    "section": "Pakete",
+    "text": "Pakete\n\npacman::p_load(tidyverse,\n               here,\n               janitor)"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#daten",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#daten",
+    "title": "Data Wrangling 2",
+    "section": "Daten",
+    "text": "Daten\n\nWir verwenden den Datensatz languageR_english.csv (im Ordner daten)\n\n\ndf_eng &lt;- read_csv(here(\"daten\", \"languageR_english.csv\")) |&gt; \n1  clean_names() |&gt;\n2  arrange(word) |&gt;\n3  rename(\n4    rt_lexdec = r_tlexdec,\n5    rt_naming = r_tnaming\n  ) |&gt; \n6  select(age_subject, word, word_category, rt_lexdec, rt_naming)\n\n\n1\n\nBereinigen (d.h. tidy) von Variablennamen (von janitor)\n\n2\n\nZeilen nach wort in ansteigender Reihenfolge anordnen (A-Z)\n\n3\n\nVariablen umbenennen…\n\n4\n\nr_tlexdec in rt_lexdec umbenennen\n\n5\n\nr_tlexdec in rt_lexdec umbenennen\n\n6\n\nnur die genannten Spalten behalten"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Bisher haben wir gelernt, wie man\n\nunsere Daten importieren (readr::read_csv)\nDaten transformieren (Paket dplyr)\nDaten zu visualisieren (Paket ggplot)\nunsere Ergebnisse mit dynamischen Berichten zu kommunizieren (Quarto)\n\naber wir haben bis jetzt nur aufgeräumte Daten gesehen\n\ndaher mussten wir den Schritt des “tidy” (Paket tidyr) noch nicht durchführen"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-1",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-1",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Tabelle 1: Version 1\n\n\n\n\n\n\n\ncountry\nyear\ncases\npopulation\n\n\n\n\nAfghanistan\n1999\n745\n19987071\n\n\nAfghanistan\n2000\n2666\n20595360\n\n\nBrazil\n1999\n37737\n172006362\n\n\nBrazil\n2000\n80488\n174504898\n\n\nChina\n1999\n212258\n1272915272\n\n\nChina\n2000\n213766\n1280428583\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 2: Version 2\n\n\n\n\n\n\n\ncountry\nyear\ntype\ncount\n\n\n\n\nAfghanistan\n1999\ncases\n745\n\n\nAfghanistan\n1999\npopulation\n19987071\n\n\nAfghanistan\n2000\ncases\n2666\n\n\nAfghanistan\n2000\npopulation\n20595360\n\n\nBrazil\n1999\ncases\n37737\n\n\nBrazil\n1999\npopulation\n172006362\n\n\nBrazil\n2000\ncases\n80488\n\n\nBrazil\n2000\npopulation\n174504898\n\n\nChina\n1999\ncases\n212258\n\n\nChina\n1999\npopulation\n1272915272\n\n\nChina\n2000\ncases\n213766\n\n\nChina\n2000\npopulation\n1280428583\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 3: Version 3\n\n\n\n\n\n\n\ncountry\nyear\nrate\n\n\n\n\nAfghanistan\n1999\n745/19987071\n\n\nAfghanistan\n2000\n2666/20595360\n\n\nBrazil\n1999\n37737/172006362\n\n\nBrazil\n2000\n80488/174504898\n\n\nChina\n1999\n212258/1272915272\n\n\nChina\n2000\n213766/1280428583"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#regeln-für-tidy-daten",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#regeln-für-tidy-daten",
+    "title": "Data Wrangling 2",
+    "section": "Regeln für ‘tidy’ Daten",
+    "text": "Regeln für ‘tidy’ Daten\n\nWahrscheinlich ist Tabelle 1 für Sie am einfachsten zu lesen\n\nsie folgt den drei Regeln für aufgeräumte Daten (visualisiert in Abbildung 2):\n\n\n\nJede Variable ist eine Spalte, jede Spalte ist eine Variable\nJede Beobachtung ist eine Zeile, jede Zeile ist eine Beobachtung\nJeder Wert ist eine Zelle, jede Zelle ist ein Einzelwert\n\n\n\nAbbildung 2: Image source: Wickham et al. (2023) (all rights reserved)"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#warum-tidy-daten",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#warum-tidy-daten",
+    "title": "Data Wrangling 2",
+    "section": "Warum ‘tidy’ Daten?",
+    "text": "Warum ‘tidy’ Daten?\n\n“Glückliche Familien sind alle gleich; jede unglückliche Familie ist auf ihre eigene Art unglücklich.”\n— Leo Tolstoy\n\n\n“‘Tidy’ Datensätze sind alle gleich, aber jeder ‘untidy’ Datensatz ist auf seine eigene Weise unordentlich.”\n— Hadley Wickham"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-2",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-2",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Die Arbeit mit aufgeräumten Daten hat zwei wesentliche Vorteile:\n\nDie Arbeit mit einer konsistenten Datenstruktur ermöglicht es uns, Konventionen zu übernehmen.\n\nAufgeräumte Daten sind die allgemein vereinbarte Datenstruktur\nKonventionen/Werkzeuge basieren auf der Annahme dieser Struktur\n\nDie vektorisierte Natur von R kann glänzen\n\ndie meisten eingebauten R-Funktionen arbeiten mit Vektorwerten (und Spalten sind im Wesentlichen Vektoren)\nAlle Pakete im tidyverse sind darauf ausgelegt, mit aufgeräumten Daten zu arbeiten (z.B. ggplot2 und dplyr)"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#tidying-daten-mit-dem-tidyverse",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#tidying-daten-mit-dem-tidyverse",
+    "title": "Data Wrangling 2",
+    "section": "‘Tidying’ Daten mit dem tidyverse",
+    "text": "‘Tidying’ Daten mit dem tidyverse\n\nDas Paket tidyr (aus tidyverse) hat zwei nützliche Funktionen zum Transponieren unserer Daten:\n\npivot_longer(): macht breite Daten länger\npivot_wider(): lange Daten breiter machen\n\n\n\n\nAbbildung 3: die berühmteste Verwendung des Wortes Pivot (zumindest für Millenials) (Friends)"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#breite-versus-lange-daten",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#breite-versus-lange-daten",
+    "title": "Data Wrangling 2",
+    "section": "Breite versus lange Daten",
+    "text": "Breite versus lange Daten\n\nWir müssen oft zwischen breiten und langen Datenformaten konvertieren, um verschiedene Arten von Zusammenfassungen oder Visualisierungen zu erstellen\nbreite Daten: alle Beobachtungen zu einer Sache befinden sich in einer einzigen Zeile\n\nist normalerweise nicht aufgeräumt\n\nlange Daten: jede Beobachtung befindet sich in einer separaten Zeile\n\nist normalerweise aufgeräumt\n\nBeginnen wir mit dem typischsten Fall: Umwandlung breiter Daten in lange Daten"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#our-goal",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#our-goal",
+    "title": "Data Wrangling 2",
+    "section": "Our goal",
+    "text": "Our goal\n\nwir wollen Abbildung 4 produzieren\n\n\n\nAbbildung 4: Our plot to be reproduced"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#pivot_longer-1",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#pivot_longer-1",
+    "title": "Data Wrangling 2",
+    "section": "pivot_longer()",
+    "text": "pivot_longer()\n\nDie Funktion pivot_longer() (von tidyr) konvertiert eine breite Datentabelle in ein längeres Format\n\nwandelt die Namen der angegebenen Spalten in die Werte einer neuen kategorischen Spalte um\nund kombiniert die Werte dieser Spalten in einer neuen Spalte\n\n\n\ndf_eng_long &lt;- \n  df_eng %&gt;% \n  pivot_longer(\n    cols = starts_with(\"rt_\"), \n    names_to = \"response\", \n    values_to = \"time\"\n  )"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-6",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-6",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "df_eng_long |&gt; head()\n\n# A tibble: 6 × 5\n  age_subject word  word_category response   time\n  &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt;\n1 young       ace   N             rt_lexdec  624.\n2 young       ace   N             rt_naming  456.\n3 old         ace   N             rt_lexdec  776.\n4 old         ace   N             rt_naming  608.\n5 young       act   V             rt_lexdec  617.\n6 young       act   V             rt_naming  446."
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-7",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-7",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Vergleichen wir die Beobachtungen für die Wörter ace und act in\n\ndf_eng (Tabelle 5)\ndf_eng_longer (Tabelle 6)\n\n\n\n\n\n\n\n\nTabelle 5: df_eng\n\n\n\n\n\n\n\nage_subject\nword\nrt_lexdec\nrt_naming\n\n\n\n\nyoung\nace\n623.61\n456.3\n\n\nold\nace\n775.67\n607.8\n\n\nyoung\nact\n617.10\n445.8\n\n\nold\nact\n715.52\n639.7\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 6: df_eng |&gt; pivot_longer(...)\n\n\n\n\n\n\n\nage_subject\nword\nresponse\ntime\n\n\n\n\nyoung\nace\nrt_lexdec\n623.61\n\n\nyoung\nace\nrt_naming\n456.30\n\n\nold\nace\nrt_lexdec\n775.67\n\n\nold\nace\nrt_naming\n607.80\n\n\nyoung\nact\nrt_lexdec\n617.10\n\n\nyoung\nact\nrt_naming\n445.80\n\n\nold\nact\nrt_lexdec\n715.52\n\n\nold\nact\nrt_naming\n639.70"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-8",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-8",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "die beiden Tabellen enthalten genau die gleichen Informationen\n\n8 Werte für die Antwortzeit:\n\n4 für rt_lexdec\n4 für rt_naming\n\n\nDies ist eine wichtige Erkenntnis: Wir haben keine Daten oder Beobachtungswerte geändert, sondern lediglich die Organisation der Datenpunkte neu strukturiert."
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-9",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-9",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Aufgabe 1: Tidy data\n\n\n\nBeispiel 1  \n\nAbbildung 5 neu erstellen."
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#pivot_wider-1",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#pivot_wider-1",
+    "title": "Data Wrangling 2",
+    "section": "pivot_wider()",
+    "text": "pivot_wider()\n\npivot wider nimmt ähnliche Argumente wie pivot_longer(), mit einigen leichten Unterschieden:\n\nid_cols (optional): identifizierende Spalten (welche Spalten identifizieren jede Beobachtung eindeutig?)\nnames_from: wie soll die neue Spalte heißen, die die vorherigen Spaltennamen enthält (muss eine kategorische Variable sein)?\nnames_prefix (optional): Präfix für die neuen Spaltennamen (optional)\nvalues_von: neue Spaltenwerte"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-10",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-10",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "lassen Sie uns zwei neue Variablen erstellen, die ihre Namen von age_subject und ihre Werte von rt_lexdec übernehmen\n\n\ndf_eng_wide &lt;-\n  df_eng %&gt;%  \n  select(-rt_naming) |&gt; \n  pivot_wider(\n1    names_from = age_subject,\n2    values_from = rt_lexdec,\n3    names_prefix = \"lexdec_\"\n  )\n\n\n1\n\nneue Spaltennamen unter Verwendung der Werte in age_subject erstellen\n\n2\n\nErstelle neue Beobachtungswerte aus rt_lexdec\n\n3\n\nHinzufügen von lexdec_ am Anfang der neuen Spaltennamen"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#section-11",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#section-11",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Vergleichen wir die Beobachtungen für die Wörter ace und act in\n\ndf_eng (Tabelle 5)\ndf_eng_longer (Tabelle 6)\n\n\n\n\n\n\n\n\nTabelle 7: df_eng\n\n\n\n\n\n\n\nage_subject\nword\nword_category\nrt_lexdec\n\n\n\n\nyoung\nace\nN\n623.61\n\n\nold\nace\nN\n775.67\n\n\nyoung\nact\nV\n617.10\n\n\nold\nact\nV\n715.52\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 8: df_eng_wide\n\n\n\n\n\n\n\nword\nword_category\nlexdec_young\nlexdec_old\n\n\n\n\nace\nN\n623.61\n775.67\n\n\nact\nV\n617.10\n715.52\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAuch hier haben wir keine Daten oder Beobachtungswerte geändert, sondern lediglich die Anordnung der Datenpunkte neu strukturiert."
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_folien_DE.html#eindeutige-werte",
+    "href": "slides/10-wrangling2/wrangling2_folien_DE.html#eindeutige-werte",
+    "title": "Data Wrangling 2",
+    "section": "Eindeutige Werte",
+    "text": "Eindeutige Werte\n\nWir haben rt_naming entfernt, weil es auch einen eindeutigen Wert pro Wort pro Altersgruppe hat\nwir ändern nur die Breite und führen NA-Werte für lexdec_young für alte Themen und NA-Werte für lexdec_old für junge Themen ein\nHätten wir sie nicht entfernt, sähen unsere ersten 6 Zeilen wie Tabelle 9 aus\n\nVergleichen Sie dies mit der Ausgabe in Tabelle 8, sehen Sie den Unterschied?\n\n\n\n\n\n\nTabelle 9: Wider data with missing values\n\n\n\n\n\n\n\nword\nword_category\nrt_naming\nlexdec_young\nlexdec_old\n\n\n\n\nace\nN\n456.3\n623.61\nNA\n\n\nace\nN\n607.8\nNA\n775.67\n\n\nact\nV\n445.8\n617.10\nNA\n\n\nact\nV\n639.7\nNA\n715.52"
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Heute werden wir lernen…\n\nüber breite versus lange Daten\nwie man breite Daten länger macht\nwie man lange Daten breiter macht\n\n\n\nDie vorgeschlagenen Ressourcen für dieses Thema sind\n\nKurs-Website: Kapitel 9 (Data Wrangling 2)\nKapitel 6 (Data Tidying) in Wickham et al. (2023)\nKapitel 8 (Data Tidying) in Nordmann & DeBruine (2022)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#ressourcen",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#ressourcen",
+    "title": "Data Wrangling 2",
+    "section": "",
+    "text": "Die vorgeschlagenen Ressourcen für dieses Thema sind\n\nKurs-Website: Kapitel 9 (Data Wrangling 2)\nKapitel 6 (Data Tidying) in Wickham et al. (2023)\nKapitel 8 (Data Tidying) in Nordmann & DeBruine (2022)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#pakete",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#pakete",
+    "title": "Data Wrangling 2",
+    "section": "1.1 Pakete",
+    "text": "1.1 Pakete\n\npacman::p_load(tidyverse,\n               here,\n               janitor)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#daten",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#daten",
+    "title": "Data Wrangling 2",
+    "section": "1.2 Daten",
+    "text": "1.2 Daten\n\nWir verwenden den Datensatz languageR_english.csv (im Ordner daten)\n\n\ndf_eng &lt;- read_csv(here(\"daten\", \"languageR_english.csv\")) |&gt; \n1  clean_names() |&gt;\n2  arrange(word) |&gt;\n3  rename(\n4    rt_lexdec = r_tlexdec,\n5    rt_naming = r_tnaming\n  ) |&gt; \n6  select(age_subject, word, word_category, rt_lexdec, rt_naming)\n\n\n1\n\nBereinigen (d.h. tidy) von Variablennamen (von janitor)\n\n2\n\nZeilen nach wort in ansteigender Reihenfolge anordnen (A-Z)\n\n3\n\nVariablen umbenennen…\n\n4\n\nr_tlexdec in rt_lexdec umbenennen\n\n5\n\nr_tlexdec in rt_lexdec umbenennen\n\n6\n\nnur die genannten Spalten behalten",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#regeln-für-tidy-daten",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#regeln-für-tidy-daten",
+    "title": "Data Wrangling 2",
+    "section": "3.1 Regeln für ‘tidy’ Daten",
+    "text": "3.1 Regeln für ‘tidy’ Daten\n\nWahrscheinlich ist Tabelle 1 für Sie am einfachsten zu lesen\n\nsie folgt den drei Regeln für aufgeräumte Daten (visualisiert in Abbildung 2):\n\n\n\nJede Variable ist eine Spalte, jede Spalte ist eine Variable\nJede Beobachtung ist eine Zeile, jede Zeile ist eine Beobachtung\nJeder Wert ist eine Zelle, jede Zelle ist ein Einzelwert\n\n\n\n\n\n\n\n\n\nAbbildung 2: Image source: Wickham et al. (2023) (all rights reserved)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#warum-tidy-daten",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#warum-tidy-daten",
+    "title": "Data Wrangling 2",
+    "section": "3.2 Warum ‘tidy’ Daten?",
+    "text": "3.2 Warum ‘tidy’ Daten?\n\n“Glückliche Familien sind alle gleich; jede unglückliche Familie ist auf ihre eigene Art unglücklich.”\n— Leo Tolstoy\n\n\n“‘Tidy’ Datensätze sind alle gleich, aber jeder ‘untidy’ Datensatz ist auf seine eigene Weise unordentlich.”\n— Hadley Wickham\n\nDie Arbeit mit aufgeräumten Daten hat zwei wesentliche Vorteile:\n\nDie Arbeit mit einer konsistenten Datenstruktur ermöglicht es uns, Konventionen zu übernehmen.\n\nAufgeräumte Daten sind die allgemein vereinbarte Datenstruktur\nKonventionen/Werkzeuge basieren auf der Annahme dieser Struktur\n\nDie vektorisierte Natur von R kann glänzen\n\ndie meisten eingebauten R-Funktionen arbeiten mit Vektorwerten (und Spalten sind im Wesentlichen Vektoren)\nAlle Pakete im tidyverse sind darauf ausgelegt, mit aufgeräumten Daten zu arbeiten (z.B. ggplot2 und dplyr)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#tidying-daten-mit-dem-tidyverse",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#tidying-daten-mit-dem-tidyverse",
+    "title": "Data Wrangling 2",
+    "section": "4.1 ‘Tidying’ Daten mit dem tidyverse",
+    "text": "4.1 ‘Tidying’ Daten mit dem tidyverse\n\nDas Paket tidyr (aus tidyverse) hat zwei nützliche Funktionen zum Transponieren unserer Daten:\n\npivot_longer(): macht breite Daten länger\npivot_wider(): lange Daten breiter machen\n\n\n\n\n\n\n\n\n\n\nAbbildung 3: die berühmteste Verwendung des Wortes Pivot (zumindest für Millenials) (Friends)",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#breite-versus-lange-daten",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#breite-versus-lange-daten",
+    "title": "Data Wrangling 2",
+    "section": "4.2 Breite versus lange Daten",
+    "text": "4.2 Breite versus lange Daten\n\nWir müssen oft zwischen breiten und langen Datenformaten konvertieren, um verschiedene Arten von Zusammenfassungen oder Visualisierungen zu erstellen\nbreite Daten: alle Beobachtungen zu einer Sache befinden sich in einer einzigen Zeile\n\nist normalerweise nicht aufgeräumt\n\nlange Daten: jede Beobachtung befindet sich in einer separaten Zeile\n\nist normalerweise aufgeräumt\n\nBeginnen wir mit dem typischsten Fall: Umwandlung breiter Daten in lange Daten",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#our-goal",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#our-goal",
+    "title": "Data Wrangling 2",
+    "section": "5.1 Our goal",
+    "text": "5.1 Our goal\n\nwir wollen Abbildung 4 produzieren\n\n\n\n\n\n\n\n\n\nAbbildung 4: Our plot to be reproduced\n\n\n\n\n\n\ndie beiden kontinuierlichen Variablen rt_lexdec und rt_naming erscheinen in Facetten\n\nfacet_wrap() nimmt eine kategorische Variable als Argument und erzeugt eine Facette für jede Kategorie\n\nwir brauchen also eine kategorische Variable, die die Ebenen lexdec und naming enthält\n\nund eine kontinuierliche Variable, die die entsprechende Antwortzeit enthält",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#pivot_longer-1",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#pivot_longer-1",
+    "title": "Data Wrangling 2",
+    "section": "5.2 pivot_longer()",
+    "text": "5.2 pivot_longer()\n\nDie Funktion pivot_longer() (von tidyr) konvertiert eine breite Datentabelle in ein längeres Format\n\nwandelt die Namen der angegebenen Spalten in die Werte einer neuen kategorischen Spalte um\nund kombiniert die Werte dieser Spalten in einer neuen Spalte\n\n\n\n1df_eng_long &lt;-\n2  df_eng %&gt;%\n3  pivot_longer(\n4    cols = starts_with(\"rt_\"),\n5    names_to = \"response\",\n6    values_to = \"time\"\n  )\n\n\n1\n\nErstellen Sie ein neues Objekt namens df_eng_long, das…\n\n2\n\ndf_eng, und dann\n\n3\n\nmache es länger\n\n4\n\nindem du Spalten (col =) nimmst, die mit rt_ beginnen\n\n5\n\nund eine Variable namens response erstellen, die die Namen aus cols enthält (names_to =)\n\n6\n\nund eine Variable namens time erstellen, die die Werte aus cols enthält (values_to =)\n\n\n\n\n\ndf_eng_long |&gt; head()\n\n# A tibble: 6 × 5\n  age_subject word  word_category response   time\n  &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt;\n1 young       ace   N             rt_lexdec  624.\n2 young       ace   N             rt_naming  456.\n3 old         ace   N             rt_lexdec  776.\n4 old         ace   N             rt_naming  608.\n5 young       act   V             rt_lexdec  617.\n6 young       act   V             rt_naming  446.\n\n\n\nVergleichen wir die Beobachtungen für die Wörter ace und act in\n\ndf_eng (Tabelle 5)\ndf_eng_longer (Tabelle 6)\n\n\n\n\n\n\n\n\nTabelle 5: df_eng\n\n\n\n\n\n\n\nage_subject\nword\nrt_lexdec\nrt_naming\n\n\n\n\nyoung\nace\n623.61\n456.3\n\n\nold\nace\n775.67\n607.8\n\n\nyoung\nact\n617.10\n445.8\n\n\nold\nact\n715.52\n639.7\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 6: df_eng |&gt; pivot_longer(...)\n\n\n\n\n\n\n\nage_subject\nword\nresponse\ntime\n\n\n\n\nyoung\nace\nrt_lexdec\n623.61\n\n\nyoung\nace\nrt_naming\n456.30\n\n\nold\nace\nrt_lexdec\n775.67\n\n\nold\nace\nrt_naming\n607.80\n\n\nyoung\nact\nrt_lexdec\n617.10\n\n\nyoung\nact\nrt_naming\n445.80\n\n\nold\nact\nrt_lexdec\n715.52\n\n\nold\nact\nrt_naming\n639.70\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndie beiden Tabellen enthalten genau die gleichen Informationen\n\n8 Werte für die Antwortzeit:\n\n4 für rt_lexdec\n4 für rt_naming\n\n\nDies ist eine wichtige Erkenntnis: Wir haben keine Daten oder Beobachtungswerte geändert, sondern lediglich die Organisation der Datenpunkte neu strukturiert.\n\n\n5.2.1 Plotten unserer ‘tidy’ Daten\n\nVersuchen wir nun, unser Diagramm zu erstellen:\n\nage_subject auf der x-Achse\ntime auf der y-Achse\nKategorien response in Facetten\n\n\n\n\n\n\n\n\n\n\nAbbildung 5: Response times per age group for the lexical decision task vs. naming task\n\n\n\n\n\n\n\n\n\n\n\nAufgabe 1: Tidy data\n\n\n\n\nBeispiel 1  \n\nAbbildung 5 neu erstellen.",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#pivot_wider-1",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#pivot_wider-1",
+    "title": "Data Wrangling 2",
+    "section": "6.1 pivot_wider()",
+    "text": "6.1 pivot_wider()\n\npivot wider nimmt ähnliche Argumente wie pivot_longer(), mit einigen leichten Unterschieden:\n\nid_cols (optional): identifizierende Spalten (welche Spalten identifizieren jede Beobachtung eindeutig?)\nnames_from: wie soll die neue Spalte heißen, die die vorherigen Spaltennamen enthält (muss eine kategorische Variable sein)?\nnames_prefix (optional): Präfix für die neuen Spaltennamen (optional)\nvalues_von: neue Spaltenwerte",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#section-10",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#section-10",
+    "title": "Data Wrangling 2",
+    "section": "6.2 ",
+    "text": "6.2 \n\nlassen Sie uns zwei neue Variablen erstellen, die ihre Namen von age_subject und ihre Werte von rt_lexdec übernehmen\n\n\ndf_eng_wide &lt;-\n  df_eng %&gt;%  \n  select(-rt_naming) |&gt; \n  pivot_wider(\n1    names_from = age_subject,\n2    values_from = rt_lexdec,\n3    names_prefix = \"lexdec_\"\n  )\n\n\n1\n\nneue Spaltennamen unter Verwendung der Werte in age_subject erstellen\n\n2\n\nErstelle neue Beobachtungswerte aus rt_lexdec\n\n3\n\nHinzufügen von lexdec_ am Anfang der neuen Spaltennamen",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#section-11",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#section-11",
+    "title": "Data Wrangling 2",
+    "section": "6.3 ",
+    "text": "6.3 \n\nVergleichen wir die Beobachtungen für die Wörter ace und act in\n\ndf_eng (Tabelle 5)\ndf_eng_longer (Tabelle 6)\n\n\n\n\n\n\n\n\nTabelle 7: df_eng\n\n\n\n\n\n\n\nage_subject\nword\nword_category\nrt_lexdec\n\n\n\n\nyoung\nace\nN\n623.61\n\n\nold\nace\nN\n775.67\n\n\nyoung\nact\nV\n617.10\n\n\nold\nact\nV\n715.52\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTabelle 8: df_eng_wide\n\n\n\n\n\n\n\nword\nword_category\nlexdec_young\nlexdec_old\n\n\n\n\nace\nN\n623.61\n775.67\n\n\nact\nV\n617.10\n715.52\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAuch hier haben wir keine Daten oder Beobachtungswerte geändert, sondern lediglich die Anordnung der Datenpunkte neu strukturiert.",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
+    ]
+  },
+  {
+    "objectID": "slides/10-wrangling2/wrangling2_blatt_DE.html#eindeutige-werte",
+    "href": "slides/10-wrangling2/wrangling2_blatt_DE.html#eindeutige-werte",
+    "title": "Data Wrangling 2",
+    "section": "6.4 Eindeutige Werte",
+    "text": "6.4 Eindeutige Werte\n\nWir haben rt_naming entfernt, weil es auch einen eindeutigen Wert pro Wort pro Altersgruppe hat\nwir ändern nur die Breite und führen NA-Werte für lexdec_young für alte Themen und NA-Werte für lexdec_old für junge Themen ein\nHätten wir sie nicht entfernt, sähen unsere ersten 6 Zeilen wie Tabelle 9 aus\n\nVergleichen Sie dies mit der Ausgabe in Tabelle 8, sehen Sie den Unterschied?\n\n\n\n\n\n\nTabelle 9: Wider data with missing values\n\n\n\n\n\n\n\nword\nword_category\nrt_naming\nlexdec_young\nlexdec_old\n\n\n\n\nace\nN\n456.3\n623.61\nNA\n\n\nace\nN\n607.8\nNA\n775.67\n\n\nact\nV\n445.8\n617.10\nNA\n\n\nact\nV\n639.7\nNA\n715.52",
+    "crumbs": [
+      "D. Palleschi",
+      "Data Wrangling 2"
     ]
   },
   {
