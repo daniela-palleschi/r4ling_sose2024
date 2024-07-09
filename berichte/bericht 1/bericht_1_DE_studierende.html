@@ -4831,6 +4831,24 @@ vertical-align: -.125em;
  <span class="menu-text">Data Wrangling 2</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/11-baseR/baseR_blatt_DE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">base R</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/12-data_viz4/data_viz4_blatt_DE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datenvisualisierung 4</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/13-troubleshooting/troubleshooting_blatt_DE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troubleshooting</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -4869,7 +4887,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Bericht 1</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<h1 class="title">Bericht 1</h1>
 </div>
 
 
@@ -5093,8 +5111,6 @@ Abbildung 1: Eine zu reproduzierende Abbildung
 <h1 data-number="5"><span class="header-section-number">5</span> Interpretation</h1>
 <p>Beschreiben Sie die Beziehung zwischen den beiden Variablen, die Sie in <a href="#fig-reproduce" class="quarto-xref">Abbildung 1</a> sehen.</p>
 
-
-<!-- -->
 
 
 </section>
@@ -5335,57 +5351,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  const viewSource = window.document.getElementById('quarto-view-source') ||
-                     window.document.getElementById('quarto-code-tools-source');
-  if (viewSource) {
-    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
-    viewSource.addEventListener("click", function(e) {
-      if (sourceUrl) {
-        // rstudio viewer pane
-        if (/\bcapabilities=\b/.test(window.location)) {
-          window.open(sourceUrl);
-        } else {
-          window.location.href = sourceUrl;
-        }
-      } else {
-        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
-        modal.show();
-      }
-      return false;
-    });
-  }
-  function toggleCodeHandler(show) {
-    return function(e) {
-      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-      for (let i=0; i<detailsSrc.length; i++) {
-        const details = detailsSrc[i].parentElement;
-        if (show) {
-          details.open = true;
-        } else {
-          details.removeAttribute("open");
-        }
-      }
-      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
-      const fromCls = show ? "hidden" : "unhidden";
-      const toCls = show ? "unhidden" : "hidden";
-      for (let i=0; i<cellCodeDivs.length; i++) {
-        const codeDiv = cellCodeDivs[i];
-        if (codeDiv.classList.contains(fromCls)) {
-          codeDiv.classList.remove(fromCls);
-          codeDiv.classList.add(toCls);
-        } 
-      }
-      return false;
-    }
-  }
-  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
-  if (hideAllCode) {
-    hideAllCode.addEventListener("click", toggleCodeHandler(false));
-  }
-  const showAllCode = window.document.getElementById("quarto-show-all-code");
-  if (showAllCode) {
-    showAllCode.addEventListener("click", toggleCodeHandler(true));
-  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp("https:\/\/daniela-palleschi\.github\.io\/r4ling_sose2024\/");
@@ -5715,262 +5680,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Bericht 1&quot;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Daniela Palleschi&quot;</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="an">institute:</span><span class="co"> Humboldt-Universität zu Berlin</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> de</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;05/28/2024&quot;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="an">date-format:</span><span class="co"> &quot;ddd [d]en DD.MM.YYYY&quot;</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">    embed-resources: true</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">    self-contained: true</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">  pdf:</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">  message: false</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="an">crossref:</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">  sec-prefix: Abschnitt</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># Beschreibung</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>Dieser Bericht dient dazu, das bisher Gelernte zu wiederholen und zu festigen. Ihre Aufgaben umfassen das Laden von Paketen und Daten sowie eine leichte Datenverarbeitung (@sec-wrangle). Außerdem werden Sie 4 Diagramme erstellen (@sec-dataviz) und eine kurze Interpretation zu einem der Diagramme schreiben (@sec-interpret). Ein Tipp: Ich empfehle Ihnen, Ihr Dokument häufig zu rendern, um eventuelle Fehler frühzeitig zu erkennen.</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>**Bitte reichen Sie sowohl das gerenderte PDF-Dokument als auch das Quarto-Skript ein.**</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="fu"># Einrichtung</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quarto</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>Öffnen Sie ein neues Quarto-Skript und speichern Sie es als <span class="in">`bericht1_nachname_vorname.qmd`</span>. Nehmen Sie die folgenden Änderungen an der YAML vor:</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>PDF als Format</span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>einen aussagekräftigen Titel</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ihren Namen als <span class="in">`Autor`</span></span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>ein Inhaltsverzeichnis (<span class="in">`toc: true`</span>)</span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>Sie können auch die YAML aus einem früheren Skript kopieren, wenn dieses die gleichen Einstellungen hat.</span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>Achten Sie darauf, Code Chunks, Prosa und Überschriften zu verwenden, um Ihre Aufgaben angemessen zu dokumentieren. Eine gute Faustregel ist, für jede (Unter-)Überschrift in diesem Dokument eine Überschrift hinzuzufügen.</span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pakete</span></span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>Laden Sie die Pakete <span class="in">`tidyverse`</span> und <span class="in">`languageR`</span> ein.</span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Pakete laden...</span></span>
-<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages needed for tables</span></span>
-<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;knitr&quot;)</span></span>
-<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;kableExtra&quot;)</span></span>
-<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(languageR)</span>
-<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
-<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>  knitr,</span>
-<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>  kableExtra</span>
-<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Daten</span></span>
-<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a>Der Datensatz <span class="in">`durationsGe`</span> aus dem languageR-Paket <span class="co">[</span><span class="ot">@languageR-package</span><span class="co">]</span> enthält Dauermessungen zur niederländischen Vorsilbe *ge*. Eine Beschreibung aller Variablen des Datensatzes findet sich in @tbl-durationGe. Ihre Aufgabe ist es: </span>
-<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Speichern Sie den Datensatz als Objekt <span class="in">`df_ge`</span> in Ihrer Umgebung (dies kann auf die gleiche Weise geschehen wie bei allen Datensätzen, die wir bisher verwendet haben)</span>
-<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Drucken Sie die ersten 10 Zeilen des Datensatzes mit der Funktion &quot;head()&quot; aus.</span>
-<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-98"><a href="#cb10-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-99"><a href="#cb10-99" aria-hidden="true" tabindex="-1"></a>df_ge <span class="ot">&lt;-</span> durationsGe</span>
-<span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Daten laden</span></span>
-<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-111"><a href="#cb10-111" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-112"><a href="#cb10-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. erste 10 Zeilen</span></span>
-<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-119"><a href="#cb10-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-durationGe</span></span>
-<span id="cb10-120"><a href="#cb10-120" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: &quot;&#39;Data dictionary&#39; für &#39;durationsGe&#39; aus dem languageR-Paket&quot;</span></span>
-<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a><span class="fu">tribble</span>(</span>
-<span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span><span class="st">&quot;Variable&quot;</span>, <span class="sc">~</span><span class="st">&quot;Description&quot;</span>, <span class="sc">~</span><span class="st">&quot;Beschreibung&quot;</span>,</span>
-<span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Word&quot;</span>, <span class="st">&quot;a factor with the words as levels&quot;</span>, <span class="st">&quot;ein Faktor mit den Wörtern als Ebenen&quot;</span>,</span>
-<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Frequency&quot;</span>, <span class="st">&quot;a numeric vector with the word’s absolute frequency in the Spoken Dutch Corpus&quot;</span>, <span class="st">&quot;ein numerischer Vektor mit der absoluten Häufigkeit des Wortes im Spoken Dutch Corpus&quot;</span>,</span>
-<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Speaker&quot;</span>, <span class="st">&quot;a factor with the speakers as levels&quot;</span>, <span class="st">&quot;ein numerischer Vektor mit der absoluten Häufigkeit des Wortes im Spoken Dutch Corpus&quot;</span>,</span>
-<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;a factor with levels female and male, this information is missing for one speaker&quot;</span>, <span class="st">&quot;ein Faktor mit den Lautsprechern als Ebenen&quot;</span>,</span>
-<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;YearOfBirth&quot;</span>, <span class="st">&quot;a numeric vector with years of birth&quot;</span>, <span class="st">&quot;ein numerischer Vektor mit Geburtsjahren&quot;</span>,</span>
-<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;DurationOfPrefix&quot;</span>, <span class="st">&quot;a numeric vector with the duration of the prefix -ge in seconds.&quot;</span>, <span class="st">&quot;ein numerischer Vektor mit der Dauer des Präfixes -ge in Sekunden.&quot;</span>,</span>
-<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;SpeechRate&quot;</span>, <span class="st">&quot;a numeric vector coding speech rate in number of syllables per second&quot;</span>, <span class="st">&quot;ein numerischer Vektor, der die Sprechgeschwindigkeit in Anzahl der Silben pro Sekunde kodiert&quot;</span>,</span>
-<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;NumberSegmentsOnset&quot;</span>, <span class="st">&quot;a numeric vector for the number of segments in the onset of the stem&quot;</span>, <span class="st">&quot;ein numerischer Vektor, der die Sprechgeschwindigkeit in Anzahl der Silben pro Sekunde kodiert&quot;</span></span>
-<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
-<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Description) <span class="sc">|&gt;</span> </span>
-<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() </span>
-<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a>  <span class="co"># kable_styling(full_width = T)</span></span>
-<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data wrangling {#sec-wrangle}</span></span>
-<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a>Hier werden Sie die <span class="in">`dplyr`</span>-Verben aus Woche 4 verwenden. Denken Sie daran, dass Sie den Zuweisungsoperator (<span class="in">`&lt;-`</span>) nur verwenden müssen, wenn Sie die Änderungen, die Sie vornehmen, als Objekt in der Umgebung speichern wollen. Wenn Sie diese Änderungen nur ausdrucken wollen, brauchen Sie den Zuweisungsoperator nicht.</span>
-<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## `filter()`</span></span>
-<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>Drucken (aber nicht in Ihrer Umgebung speichern) Sie die Zeilen von <span class="in">`df_ge`</span>, in denen SpeechRate über 9 liegt, nur mit den Spalten word, speaker und SpeechRate. Es sollten 5 Zeilen sein.</span>
-<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a><span class="co"># subsetting</span></span>
-<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-159"><a href="#cb10-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a>df_ge <span class="sc">|&gt;</span> </span>
-<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SpeechRate <span class="sc">&gt;</span> <span class="dv">9</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Word, Speaker, SpeechRate)</span>
-<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a><span class="fu">## `mutate()`</span></span>
-<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>Fügen Sie eine neue Variable hinzu, <span class="in">`duration_ms`</span>, die <span class="in">`DauerVonPräfix`</span> multipliziert mit 1000 (<span class="in">`DurationOfPrefix*1000`</span>) entspricht. Dies entspricht der Dauer von *ge* in Millisekunden, statt in Sekunden. Stellen Sie sicher, dass Sie diese neue Variable in Ihrem Datenrahmen speichern (Hinweis: Sie müssen den Zuweisungsoperator <span class="in">`&lt;-`</span> und das <span class="in">`dplyr`</span>-Verb <span class="in">`mutate()`</span> verwenden).</span>
-<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a><span class="co"># mutate(): duration_ms</span></span>
-<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a>df_ge <span class="ot">&lt;-</span></span>
-<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a>  df_ge <span class="sc">|&gt;</span> </span>
-<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">duration_ms =</span> DurationOfPrefix<span class="sc">*</span><span class="dv">1000</span>)</span>
-<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fehlersuche</span></span>
-<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a>Warum läuft dieser Code nicht? Es gibt zwei Probleme mit dem Code, identifizieren und beheben Sie sie.</span>
-<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a><span class="co"># Troubleshooting</span></span>
-<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>df_ge  <span class="sc">|&gt;</span> </span>
-<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(YearOfBirth <span class="sc">==</span> <span class="dv">1978</span>) <span class="sc">+</span></span>
-<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Frequency, word)</span>
-<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a><span class="co"># Lösung</span></span>
-<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a><span class="fu"># Datenvisualisierung {#sec-dataviz}</span></span>
-<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a>Verwenden Sie für alle Diagramme <span class="in">`labs(title = &quot;...&quot;)`</span>, um entsprechende Diagrammtitel hinzuzufügen. </span>
-<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a>*Optional*: Ändern Sie die <span class="in">`x`</span> und <span class="in">`y`</span> Achsenbeschriftungen, wenn Sie wollen, mit <span class="in">`labs(x = &quot;...&quot;, y = &quot;...&quot;)`</span>. Vielleicht möchten Sie auch ein Thema hinzufügen (z.B. <span class="in">`theme_minimal()`</span>).</span>
-<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a><span class="fu">## Streudiagramm</span></span>
-<span id="cb10-218"><a href="#cb10-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-219"><a href="#cb10-219" aria-hidden="true" tabindex="-1"></a>Erstellen Sie ein Streudiagramm (<span class="in">`geom_point()`</span>) mit <span class="in">`SpeechRate`</span> (x-Achse) und <span class="in">`DurationOfPrefix`</span> (y-Achse), mit YearOfBirth als Farbe (<span class="in">`colour`</span>). Ändern Sie die Einstellungen für den Codechunk so, dass das Diagramm beim Rendern des Skripts *nicht* gedruckt wird, der Code aber schon. Tipp: Sie müssen <span class="in">`#| eval:`</span> verwenden.</span>
-<span id="cb10-220"><a href="#cb10-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-223"><a href="#cb10-223" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-224"><a href="#cb10-224" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-225"><a href="#cb10-225" aria-hidden="true" tabindex="-1"></a><span class="co"># Streudiagramm + #| eval:</span></span>
-<span id="cb10-226"><a href="#cb10-226" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-227"><a href="#cb10-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-230"><a href="#cb10-230" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-231"><a href="#cb10-231" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-232"><a href="#cb10-232" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb10-233"><a href="#cb10-233" aria-hidden="true" tabindex="-1"></a>df_ge <span class="sc">|&gt;</span> </span>
-<span id="cb10-234"><a href="#cb10-234" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb10-235"><a href="#cb10-235" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> NumberSegmentsOnset, <span class="at">fill =</span> Sex) <span class="sc">+</span></span>
-<span id="cb10-236"><a href="#cb10-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
-<span id="cb10-237"><a href="#cb10-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb10-238"><a href="#cb10-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-239"><a href="#cb10-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-240"><a href="#cb10-240" aria-hidden="true" tabindex="-1"></a><span class="fu">## Facetten</span></span>
-<span id="cb10-241"><a href="#cb10-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-242"><a href="#cb10-242" aria-hidden="true" tabindex="-1"></a>Fügen Sie Facetten für <span class="in">`Sex`</span> hinzu (denken Sie daran, die Tilde <span class="in">`~`</span> einzufügen). Ändern Sie die Code-Chunk-Einstellungen so, dass die Darstellung gedruckt wird, wenn das Skript gerendert wird, aber der Code nicht (Sie benötigen <span class="in">`echo`</span> anstelle von <span class="in">`eval`</span>).</span>
-<span id="cb10-243"><a href="#cb10-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-246"><a href="#cb10-246" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-247"><a href="#cb10-247" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: fenced</span></span>
-<span id="cb10-248"><a href="#cb10-248" aria-hidden="true" tabindex="-1"></a><span class="co"># Streudiagramm + Facetten + #| echo:</span></span>
-<span id="cb10-249"><a href="#cb10-249" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-250"><a href="#cb10-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-251"><a href="#cb10-251" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproduzieren eines Plots</span></span>
-<span id="cb10-252"><a href="#cb10-252" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-253"><a href="#cb10-253" aria-hidden="true" tabindex="-1"></a>Reproduzieren Sie die @fig-reproduce (es muss keine exakte Kopie sein, aber kommen Sie ihr so nahe wie möglich). Stellen Sie sicher, dass sowohl der Code als auch die Darstellung beim Rendern gedruckt werden. Hinweis: Sie müssen <span class="in">`filter()`</span> sowohl für <span class="in">`Frequency`</span> als auch für <span class="in">`Sex`</span> verwenden. Ich würde mich darauf konzentrieren, zuerst das Diagramm zu erstellen und dann zu versuchen, die Daten zu filtern.</span>
-<span id="cb10-254"><a href="#cb10-254" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-257"><a href="#cb10-257" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-258"><a href="#cb10-258" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb10-259"><a href="#cb10-259" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-260"><a href="#cb10-260" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-reproduce</span></span>
-<span id="cb10-261"><a href="#cb10-261" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: Eine zu reproduzierende Abbildung</span></span>
-<span id="cb10-262"><a href="#cb10-262" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> df_ge <span class="sc">|&gt;</span> </span>
-<span id="cb10-263"><a href="#cb10-263" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb10-264"><a href="#cb10-264" aria-hidden="true" tabindex="-1"></a>         Sex <span class="sc">!=</span> <span class="st">&quot;NA&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb10-265"><a href="#cb10-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb10-266"><a href="#cb10-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> duration_ms, <span class="at">fill =</span> Sex, <span class="at">colour =</span> Sex) <span class="sc">+</span></span>
-<span id="cb10-267"><a href="#cb10-267" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Verteilung der Dauern von &#39;ge&#39; nach Geschlecht der Teilnehmer&quot;</span>,</span>
-<span id="cb10-268"><a href="#cb10-268" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Dauern von &#39;ge&#39; (Millisekunden)&quot;</span>,</span>
-<span id="cb10-269"><a href="#cb10-269" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Dichte&quot;</span>) <span class="sc">+</span></span>
-<span id="cb10-270"><a href="#cb10-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb10-271"><a href="#cb10-271" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
-<span id="cb10-272"><a href="#cb10-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-273"><a href="#cb10-273" aria-hidden="true" tabindex="-1"></a>plot</span>
-<span id="cb10-274"><a href="#cb10-274" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-275"><a href="#cb10-275" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb10-278"><a href="#cb10-278" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-279"><a href="#cb10-279" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb10-280"><a href="#cb10-280" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb10-281"><a href="#cb10-281" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;berichte/bericht 1/plot_to_reproduce.png&quot;</span>), plot,</span>
-<span id="cb10-282"><a href="#cb10-282" aria-hidden="true" tabindex="-1"></a>       <span class="at">dpi =</span> <span class="dv">300</span>,</span>
-<span id="cb10-283"><a href="#cb10-283" aria-hidden="true" tabindex="-1"></a>       <span class="at">width =</span> <span class="dv">3000</span>,</span>
-<span id="cb10-284"><a href="#cb10-284" aria-hidden="true" tabindex="-1"></a>       <span class="at">height =</span> <span class="dv">3000</span>,</span>
-<span id="cb10-285"><a href="#cb10-285" aria-hidden="true" tabindex="-1"></a>       <span class="at">scale =</span> .<span class="dv">7</span>,</span>
-<span id="cb10-286"><a href="#cb10-286" aria-hidden="true" tabindex="-1"></a>       <span class="at">units =</span> <span class="st">&quot;px&quot;</span>)</span>
-<span id="cb10-287"><a href="#cb10-287" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-288"><a href="#cb10-288" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb10-289"><a href="#cb10-289" aria-hidden="true" tabindex="-1"></a><span class="fu"># Interpretation {#sec-interpret}</span></span>
-<span id="cb10-290"><a href="#cb10-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-291"><a href="#cb10-291" aria-hidden="true" tabindex="-1"></a>Beschreiben Sie die Beziehung zwischen den beiden Variablen, die Sie in @fig-reproduce sehen.</span>
-</code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div></div></div></div>
+</script>
 </div> <!-- /content -->
 
 
