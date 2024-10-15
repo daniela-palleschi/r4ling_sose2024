@@ -5,7 +5,7 @@ Teaching materials for 'Angewandte Datenverarbeitung und Visualisierung: R für 
 
 To re-use these materials, you need to restore the lockfile which contains all package dependencies. To do so:
 
-1. download the .zip file of the project (or fork it, whatever you prefer)
+1. Download the .zip file of the project (or fork it, whatever you prefer)
 2. Double-click on the RProject (`.Rproj`) in your file manager. RStudio should open.
 3. The console should display some information about `renv`:
 
