@@ -1,0 +1,756 @@
+---
+title: "Datenvisualiserung 1"
+subtitle: "Visualisierung von Verteilungen"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 2 - Datenvisualisierung 1" 
+lang: de
+date: "04/23/2024"
+date-format: "ddd [d]en DD.MM.YYYY"
+date-modified: last-modified
+format: 
+  html:
+    output-file: datenviz1_blatt.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: datenviz1_folien.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: datenviz1.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: ../../references.bib
+csl: ../../apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = T, # continueeven when error encountered
+                      warning = F) # don't print warnings
+```
+
+
+
+# Wiederholung {.unnumbered .unlisted}
+
+Letzte Woche haben wir...
+
+- R und RStudio installiert
+- unser erstes R-Skript erstellt
+- einfache Arithmetik mit Objekten und Vektoren durchgeführt
+
+## Wiederholung {.unnumbered .unlisted}
+
+```{r}
+x <- c(1,2,3)
+y <- sum(1,2,3)
+```
+
+<!-- https://rviews.rstudio.com/2017/12/04/how-to-show-r-inline-code-blocks-in-r-markdown/ -->
+
+- Was enthalten die Vektoren `x` und `y`?
+
+- Das Objekt `x` enthält `r x`
+- Das Objekt `y` enthält `r y`
+
+# Heutige Ziele {.unnumbered}
+
+Heute werden wir lernen...
+
+- was Datenframes sind
+- den Unterschied zwischen kategorialen und kontinuierlichen Daten
+- wie man Diagramme mit `ggplot` erstellt
+- die richtige Darstellung für unsere Daten auszuwählen
+
+## Endgültiges Ziel {.unnumbered}
+
+- Unser heutiges Ziel ist es, die Daten wie folgt zu visualisieren
+    - Das Diagramm zeigt die Verteilung (`Anzahl`) der Reaktionszeiten und der Muttersprache der Teilnehmer
+
+```{r}
+#| echo: false
+#| warning: false
+
+pacman::p_load(tidyverse, languageR, ggthemes, patchwork)
+df_lexdec <- lexdec
+
+ggplot(df_lexdec, aes(x = exp(RT), fill = NativeLanguage)) +
+  geom_histogram(position="identity", alpha = .4) +
+  labs(title = "Reaction times by speaker group",
+       x = "Reaction time (ms)") +
+  scale_fill_colorblind() +
+  theme_minimal() +
+
+ggplot(df_lexdec, aes(x = NativeLanguage, fill = NativeLanguage)) +
+  geom_bar() +
+  labs(title = "Observations per speaker group",
+       x = "Native language") +
+  scale_fill_colorblind() +
+  theme_minimal() +
+  
+  plot_annotation(tag_levels = "A") & 
+  
+  theme(legend.position = 'bottom') 
+```
+
+## Vorbereitung {.unnumbered}
+
+In Ihrem RProject-Ordner...
+
+- erstellen Sie einen neuen Ordner mit dem Namen `moodle`
+    + Laden Sie die Moodle-Materialien von heute herunter und speichern Sie sie dort
+- Erstellen Sie einen neuen Ordner in `notes` mit dem Namen `02-datenviz1`
+- öffne ein neues `.R` Skript
+    + speichere es in dem neuen Ordner 
+
+### Pakete
+
+-   Pakete laden (und installieren)
+    -   `tidyverse`
+    -   `languageR`
+    -   `ggthemes`
+    -   `patchwork`
+
+```{r}
+#| eval: false
+#| code-line-numbers: false
+# in the CONSOLE: install packages if needed
+install.packages("tidyverse")
+install.packages("languageR")
+install.packages("ggthemes") # for customising our plots
+install.packages("patchwork") # plot layouts
+```
+
+```{r}
+#| code-line-numbers: false
+# Pakete laden
+library(tidyverse)
+library(languageR)
+library(ggthemes)
+library(patchwork)
+```
+
+```{r}
+#| echo: false
+pacman::p_load(
+  knitr,
+  kableExtra
+)
+```
+
+# Datenrahmen
+
+- Datenrahmen sind eine Sammlung von Variablen, wobei
+  + jede Variable eine Spalte ist
+  + jede Zeile eine einzelne Beobachtung/ein einzelner Datenpunkt ist
+  + jede Zelle in einer Zeile verknüpft ist
+- Datenrahmen sind genau wie Tabellenkalkulationen, aber rechteckig
+
+- Verschiedene Wörter für Datenrahmen:
+  + Datenrahmen
+  + Datensatz
+  + Tibble (im `tidyverse`)
+  
+## Sprechen über Datensätze
+
+- eine **Variable**: eine Menge, Qualität oder Eigenschaft, die man messen kann
+- ein **Wert**: der Zustand einer Variablen, wenn man sie misst
+- eine **Beobachtung**: eine Reihe von Messungen, die unter ähnlichen Bedingungen durchgeführt werden
+    - enthält mehrere Werte, die jeweils mit einer Variablen verbunden sind
+    - eine Beobachtung für eine einzelne Variable wird manchmal als *Datenpunkt* bezeichnet
+- **Tabellendaten** sind eine Reihe von Werten, die jeweils mit einer Variablen und einer Beobachtung verbunden sind
+    - Tabellarische Daten sind "tidy", wenn jeder Wert in einer eigenen *Zelle*, jede Variable in einer eigenen Spalte und jede Beobachtung in einer eigenen Zeile steht
+
+
+## Kategoriale und kontinuierliche Variablen
+
+- Wie wir die Verteilung einer Variablen darstellen, hängt davon ab, welche Art von Daten sie repräsentiert: *kategorisch* oder *numerisch*
+- Eine Variable ist *kategorisch*, wenn sie eine kleine Menge von Werten annehmen kann, die sich in Gruppen zusammenfassen lassen
+  + z. B. alt/jung, klein/groß, grammatikalisch/ungrammatikalisch, L1/L2-Sprecher
+- eine Variable ist *numerisch* (d. h. quantitativ), wenn sie eine große Bandbreite an numerischen Werten annehmen kann
+    - und es sinnvoll wäre, zu addieren, zu subtrahieren, den Mittelwert zu berechnen usw.
+    - kann *kontinuierlich* sein (Dezimalpunkte sind sinnvoll, z. B. 1,5 cm)
+    - oder *diskret* (Dezimalpunkte sind *nicht* sinnvoll, z. B. 1,5 Kinder sind nicht sinnvoll)
+
+- wir erstellen verschiedene Diagramme, je nachdem, welche Art von Variablen wir visualisieren wollen
+
+# Lexical Decision Task (LDT)
+
+- unser erster Datensatz enthält Daten aus einer lexikalischen Entscheidungsaufgabe
+
+- Bei der LDT drücken die Teilnehmer eine Taste, um anzugeben, ob ein Wort ein echtes Wort oder ein Pseudowort ist.
+
+::: {.content-visible when-format="revealjs"}
+```{r eval = T, fig.env = "figure", out.width="100%", fig.align = "center"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/lexical_decision_task_testabledotorg.png"))
+```
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r eval = T, fig.env = "figure", out.width="100%", fig.align = "center", fig.cap="Source: https://www.testable.org/wp-content/uploads/2022/11/Lexical_decision_task-1024x576.png"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/lexical_decision_task_testabledotorg.png"))
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r eval = T, fig.env = "figure", out.width="100%", fig.align = "center"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/lexical_decision_task_testabledotorg.png"))
+```
+:::
+
+## LDT-Variablen
+
+- Die üblichen Variablen, die in einem Experiment zur lexikalischen Entscheidungsaufgabe erhoben werden, sind:
+  + Reaktionszeit
+  + Genauigkeit (richtig/falsch)
+  + Wortkategorie (z. B. real/pseudo, Nomen/Verb)
+  + Worthäufigkeit
+
+- Zusätzliche Variablen, die erhoben werden könnten, sind:
+  + demografische Daten der Teilnehmer (z. B. Alter, L1/L2, Geschlecht)
+
+# `lexdec` Datensatz
+
+- `languageR` ist ein Begleitpaket für das Lehrbuch @baayen_analyzing_2008
+  + enthält linguistische Datensätze, z.B. `lexdec`.
+
+- der `lexdec`-Datensatz enthält Daten für eine lexikalische Entscheidungsaufgabe im Englischen
+  + wir werden mit Variablen wie Reaktionszeiten und Genauigkeit arbeiten
+
+## `lexdec`-Variablen
+
+- eine Liste einiger der Variablen ist in @tbl-lexdec enthalten
+
+```{r}
+#| label: tbl-lexdec
+#| tbl-cap: "Datenwörterbuch für `df_lexdec`: Lexikalische Entscheidungslatenzen, die von 21 Probanden für 79 konkrete englische Substantive erhoben wurden, mit Variablen, die mit dem Subjekt oder dem Wort verknüpft sind."
+#| echo: false
+
+# dput(names(df_lexdec))
+
+tribble(
+  ~"Variable", ~"Beschreibung",
+  "Subject", "ein Faktor für die Probanden",
+  "RT", "ein numerischer Vektor für die Reaktionszeit in Millisekunden",
+  "Trial", "ein numerischer Vektor für den Rang des Versuchs in der Versuchsliste",
+  "Sex", "ein Faktor mit den Ausprägungen F (weiblich) und M (männlich)",
+  "NativeLanguage", "ein Faktor mit den Niveaus English und Other, der zwischen englischen Muttersprachlern und Nicht-Muttersprachlern unterscheidet",
+) %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+## LDT-Forschungsfragen
+
+- bevor wir ein Experiment durchführen, haben wir Forschungsfragen, die wir mit den Daten beantworten wollen
+  + Wir werden uns heute mit der folgenden Frage beschäftigen:
+    + Unterscheiden sich die Reaktionszeiten zwischen Muttersprachlern und Nicht-Muttersprachlern?
+
+## Laden der Daten
+
+- unsere Daten sind in dem Paket `lanaugeR` verfügbar, das wir bereits geladen haben
+    - um die Daten zu drucken, geben Sie einfach den Namen des Datensatzes ein und führen Sie ihn aus
+- Unten sehen wir nur ein paar Variablen, aber Sie sollten mehr in Ihrer Konsole sehen
+
+```{r}
+#| output-location: fragment
+#| eval: false
+lexdec
+```
+
+```{r}
+#| echo: false
+head(lexdec[1:8])
+```
+
+- Wie viele Variablen haben wir? Beobachtungen?
+
+### Daten als Objekt speichern
+
+- Um die Daten in unserer Umgebung zu speichern, müssen wir ihnen einen Namen zuweisen
+  + Nennen wir es `df_lexdec`, was soviel bedeutet wie "Datenrahmen lexikalische Entscheidung".
+
+```{r}
+df_lexdec <- lexdec
+```
+
+- jetzt sehen wir es in unserem Enrivonment
+  + Doppelklicken Sie darauf, um es im Editorfenster zu sehen.
+  
+## Relevante Variablen
+
+- Zu den Variablen, die wir haben, gehören:
+    1.  **Subjekt**: Teilnehmer-ID
+    2.  **RT**: protokollierte Reaktionszeiten
+    3.  **NativeLanguage**: die Muttersprache des Teilnehmers
+    4.  **Word**: welches Wort präsentiert wurde
+    5.  **Class**: ob das Wort ein Tier oder eine Pflanze war
+
+::: callout-tip
+### [Aufgabe @exm-help]: `?lexdec`
+
+::: {#exm-help .custom}
+::: nonincremental
+Um herauszufinden, wofür die anderen Variablen stehen, führen Sie `?lexdec` in der Konsole aus.
+:::
+:::
+:::
+
+# Erstellen von Plots mit `ggplot2`
+
+- das `tidyverse` ist eine Sammlung von Paketen, die das Aufräumen und die Visualisierung von Daten erleichtern
+    - wenn wir `tidyverse` laden, wird diese Sammlung von Paketen automatisch geladen
+- das `ggplot2`-Paket ist ein `tidyverse`-Paket, das Plots in Schichten aufbaut
+
+## `ggplot2` Schichten {.unlisted .unnumbered}
+
+```{r}
+#| echo: false
+#| label: fig-layers
+#| fig-cap: Example of layers in a ggplot figure
+#| fig-align: center
+#| fig-asp: .75
+
+  ggplot(df_lexdec) +
+  labs(title = "Layer 1") +
+
+ggplot(df_lexdec) +
+  aes(x = exp(RT), fill = NativeLanguage) +
+  labs(title = "Layer 2") +
+
+ggplot(df_lexdec) +
+  aes(x = exp(RT)) +
+  geom_histogram(fill = "darkblue") +
+  labs(title = "Layer 3") +
+
+ggplot(df_lexdec) +
+  aes(x = exp(RT)) +
+  geom_histogram(fill = "darkblue") +
+  labs(title = "Layer 4",
+       x = "Reaction times (ms)",
+       y = "N observations") +
+
+ggplot(df_lexdec) +
+  aes(x = exp(RT)) +
+  geom_histogram(fill = "darkblue") +
+  labs(title = "Layer 5",
+       x = "Reaction times (ms)",
+       y = "N observations") +
+  theme_minimal() +
+
+ggplot(df_lexdec) +
+  aes(x = exp(RT), fill = NativeLanguage) +
+  geom_histogram(alpha = .7) +
+  labs(title = "Layer 6",
+       x = "Reaction times (ms)",
+       y = "N observations") +
+  scale_fill_manual(values = c("darkblue", "darkred")) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  
+  plot_layout(nrow = 2)
+```
+
+
+## Schicht 1: leere Leinwand
+
+- die erste Ebene mit der Funktion `ggplot()` ist wie eine leere Leinwand
+
+```{r}
+#| output-location: fragment
+#| label: fig-schicht-1
+#| fig-cap: Leerer `ggplot()`
+ggplot(data = df_lexdec)
+```
+
+## Schicht 2: Ästhetik der Darstellung
+
+- als nächstes teilen wir `ggplot()` mit, wie unsere Variablen visuell dargestellt werden sollen
+    - Wir fügen das `+` am Ende unserer Codezeile ein und verwenden in einer neuen Codezeile die Funktion `aes()`, um unsere *Ästhetik* zu definieren.
+- Unsere erste Ästhetik bildet die Reaktionszeiten (`RT`) auf der x-Achse ab (der untere Teil der Grafik)
+    - wir wickeln die protokollierte `RT` in die Funktion `exp()` ein, um RTs in Millisekunden zu erhalten (aus Gründen, die wir nicht diskutieren werden)
+
+
+```{r}
+#| output-location: slide
+#| label: fig-schicht-2
+#| fig-cap: Plot mit x-Achse
+ggplot(data = df_lexdec) +
+  aes(x = exp(RT))
+```
+
+## Schicht 3: Hinzufügen von Beobachtungen
+
+- wir sehen keine Beobachtungen (d.h. die Balken) in der Grafik, warum nicht?
+    - wir haben `ggplot()` nicht gesagt, wie sie dargestellt werden sollen
+- wir müssen ein **Geom** definieren: das *geom*etrische Objekt, das ein Diagramm verwendet, um Daten darzustellen
+    - in `ggplot2` beginnen die Geom-Funktionen mit `geom_`
+    - wir beschreiben Diagramme oft in Bezug auf die Arten von Geomen, die sie verwenden, z.B. verwenden Balkendiagramme Balkengeome (`geom_bar()`), Liniendiagramme Liniengeome (`geom_line()`), Punktdiagramme ein Punktgeom (`geom_point()`), usw.
+
+::: {.content-visible when-format="revealjs"}
+## Schicht 3: Hinzufügen von Beobachtungen {.unlisted .unnumbered}
+:::
+
+- Erzeugen wir unser Histogramm mit dem Geom `geom_histogram()`
+
+```{r}
+#| output-location: fragment
+#| label: fig-schicht-3
+#| fig-cap: Histogram
+
+ggplot(data = df_lexdec) +
+  aes(x = exp(RT)) +
+  geom_histogram()
+```
+
+
+
+::: {.content-visible when-format="revealjs"}
+## {.smaller}
+:::
+
+
+::: callout-note
+Wir erhielten die folgende Meldung, als wir `geom_point()` einschlossen:
+
+> `stat_bin()` mit `bins = 30`. Wählen Sie einen besseren Wert mit `binwidth`.
+
+Dies sagt uns nur etwas über die Breite unserer Balken: jeder Balken repräsentiert einen Bereich möglicher Reaktionszeitwerte
+  + `bins = 30` bedeutet einfach, dass es 30 Balken gibt, wir können dies ändern und mehr oder weniger Balken haben, indem wir z.B. `bins = 20` oder `bins = 100` in `geom_histogram()` einfügen
+
+```{r}
+#| output-location: fragment
+#| code-fold: true
+#| label: fig-binwidth
+#| fig-cap: Histogram mit 20 bins (A) oder 100 bins (B)
+
+ggplot(
+  data = df_lexdec,
+  mapping = aes(x = exp(RT))
+) +
+  labs(title = "with geom_histogram(bins = 20)") +
+  geom_histogram(bins = 20) +
+
+  ggplot(
+  data = df_lexdec,
+  mapping = aes(x = exp(RT))
+) +
+  labs(title = "with geom_histogram(bins = 100)") +
+  geom_histogram(bins = 100) +
+  plot_annotation(tag_levels = "A")
+```
+
+:::
+
+## Hinzufügen von Ästhetik {.smaller}
+
+- Es ist nützlich, die Verteilung der Reaktionszeiten im Allgemeinen zu sehen.
+    - aber wir wollen normalerweise Gruppen vergleichen
+    - z.B. Unterschiede zwischen Muttersprachlern und Nicht-Muttersprachlern oder zwischen verschiedenen Wortarten
+- Wir haben auch die Muttersprache als Variable, wie könnten wir diese in unserem Diagramm visualisieren?
+
+```{r}
+#| output-location: fragment
+#| code-fold: true
+#| label: fig-schicht-4
+#| fig-cap: ggplot() mit `aes(fill = NativeLanguage)`
+ggplot(
+  data = df_lexdec,
+  aes(x = exp(RT), fill = NativeLanguage)
+) +
+  geom_histogram()
+```
+
+::: {.content-visible when-format="revealjs"}
+## Stapeln versus Schichten von Histogrammen {.unlisted .smaller}
+:::
+
+- wir sehen die roten und die blauen Balken, aber ist das blaue Histogramm über das rote geschichtet?
+  + oder sind die roten Balken über den blauen Balken gestapelt?
+- Es ist letzteres
+  + stellen wir es so ein, dass das blaue Histogramm über dem roten liegt
+
+```{r}
+#| output-location: fragment
+#| code-fold: true
+#| label: fig-stacked-dodged
+#| fig-cap: "'stacked' gegen 'layered' Histogramme"
+
+ggplot(
+  data = df_lexdec,
+  aes(x = exp(RT))
+) +
+  labs(title = "No grouping") +
+  geom_histogram() + 
+
+ggplot(
+  data = df_lexdec,
+  aes(x = exp(RT), fill = NativeLanguage)
+) +
+  labs(title = "Stacked") +
+  geom_histogram() + 
+  
+ggplot(
+  data = df_lexdec,
+  aes(x = exp(RT), fill = NativeLanguage)
+) +
+  labs(title = "Layered: position = \"identity\"") +
+  geom_histogram(position = "identity") +
+  
+  
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom') 
+```
+
+
+## Globale und lokale Ästhetik
+
+- in unserer endgültigen Darstellung ist die Farbe der Histogramme leicht transparent
+  + Wir können dies steuern, indem wir das Argument `alpha = 0.3` zu `geom_histogram()` hinzufügen.
+  + alpha kann jeden anderen Wert zwischen 0 und 1 annehmen.
+
+::: {.content-visible when-format="revealjs"}
+## Globale und lokale Ästhetik
+:::
+
+::: callout-tip
+### [Aufgabe @exm-local]: Transparenz
+
+::: {#exm-local .custom}
+::: nonincremental
+Spielen Sie mit der Transparenz des Histogramms Geom. Wählen Sie den von Ihnen bevorzugten Alpha-Wert. Die Ausgabe sollte in etwa so aussehen:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-alpha
+#| fig-cap: Histogram mit `alpha = 0.3`
+ggplot(
+  data = df_lexdec,
+  aes(x = exp(RT), fill = NativeLanguage)
+) +
+  geom_histogram(position = "identity", alpha = 0.3)
+```
+:::
+:::
+:::
+
+
+## Anpassen unseres Plots
+
+- wir können unsere Achsen- und Legendenbeschriftungen verbessern und auch Titel hinzufügen, indem wir die Funktion `labs()` verwenden
+- Wir können auch die Funktion `scale_fill_colorblind()` aus dem Paket `ggthemes` verwenden.
+    - dies erzeugt farbenblind-sichere Farben
+- Wir werden auch die Funktion `theme_minimal()` aus dem Paket `ggplot2` verwenden; was bewirkt diese Funktion?
+
+- Versuchen Sie, Ihrem Diagramm Folgendes hinzuzufügen
+  + Ändern Sie die Beschriftungen entsprechend
+  + und fügen Sie dem Code sinnvolle Kommentare mit `#` hinzu
+
+```{r}
+#| eval: false
+labs(title = "Plot title",
+     x = "x-axis label",
+     y = "y-axis label") +
+  scale_fill_colorblind() +
+  theme_minimal()
+```
+
+## Kommentar {.smaller}
+
+- Der Code und die Darstellung sollten in etwa so aussehen:
+
+```{r}
+#| output-location: fragment
+#| warning: false
+#| label: fig-labels
+#| fig-cap: Histogramm mit Beschriftungen
+
+# histogram of reaction times by native language
+ggplot(data = df_lexdec) +
+  aes(x = exp(RT), fill = NativeLanguage) + # set aesthetics
+  labs(title = "Reaction times by L1",
+     x = "Reaction times (ms)") +
+  geom_histogram(position = "identity", alpha = 0.3) +
+  scale_fill_colorblind() + # make fill colorblind friendly
+  theme_minimal() # set plot theme
+```
+
+## Speichern von Plots
+
+- Wir können Diagramme in unserer Umgebung speichern, genau wie wir Zahlen und Daten als Objekte speichern können.
+    + Sie können Objekte beliebig benennen
+    + aber es ist ratsam, den Namen sinnvoll zu gestalten (z.B. *nicht* `fig1` oder `xyz`)
+- Nennen wir diese Grafik `fig_lexdec_rt`, für "figure lexical decision task reaction times".
+
+```{r}
+#| warning: false
+#| eval: true
+#| echo: false
+
+fig_lexdec_rt <-
+  ggplot(data = df_lexdec) +
+  aes(x = exp(RT), fill = NativeLanguage) + # set aesthetics
+  labs(title = "Reaction times by L1",
+     x = "Reaction times (ms)") +
+  geom_histogram(position = "identity", alpha = 0.3) +
+  scale_fill_colorblind() + # make fill colorblind friendly
+  theme_minimal() # set plot theme
+```
+
+::: callout-tip
+### [Aufgabe @exm-save]: Figur als Objekt speichern
+
+::: {#exm-save .custom}
+::: nonincremental
+1.  Speichern Sie unsere endgültige Darstellung als Objekt mit dem Namen `fig_lexdec_rt`.
+:::
+:::
+:::
+
+## Balkendiagramme
+
+1. Kopieren Sie den Code für Ihr Histogramm
+2. Nehmen Sie die folgenden Änderungen vor, um unser Balkendiagramm darzustellen
+    + Entfernen Sie die Namenszuweisung (`fig_lexdec_rt`)
+    + auf der x-Achse wollen wir `NativeLanguage`
+    + Ersetzen Sie `geom_histogram()` durch `geom_bar()`
+      + Entfernen Sie die Argumente für das Histogramm (kein `position` oder `alpha`)
+    + ändern Sie die Beschriftungen entsprechend
+3. Speichern Sie das Diagramm als Objekt mit einem aussagekräftigen Namen (z.B. `fig_lexdec_l1`)
+
+## 
+
+- sollte das Diagramm in etwa so aussehen:
+
+```{r}
+#| echo: false
+#| label: fig-barplot
+#| fig-cap: Balkondiagramm
+fig_lexdec_l1 <-
+  ggplot(data = df_lexdec) +
+  aes(x = NativeLanguage, fill = NativeLanguage) + # set aesthetics
+  labs(title = "Observations per L1",
+     x = "Native Language") +
+  geom_bar() +
+  scale_fill_colorblind() + # make fill colorblind friendly
+  theme_minimal() # set plot theme
+
+fig_lexdec_l1
+```
+
+
+## Kombinieren von Plots
+
+- Ein Grund, Ihre Darstellung als Objekt zu speichern, ist, dass wir sie später aufrufen können
+    - d.h. Sie können den Plot an einer Stelle in Ihrem Dokument erstellen, sich aber entscheiden, ihn erst im gerenderten Bericht weiter unten zu drucken
+- ein weiterer Grund ist, dass wir mehrere Diagramme kombinieren können
+    - Dies kann mit einer Vielzahl von Paketen geschehen
+    - Versuchen wir es mit dem Paket `patchwork`
+      + Benutze `+` um zwei Plots nebeneinander zu verbinden
+      + oder `/`, um sie übereinander darzustellen
+
+### Kombinieren von Plots mit `+`
+
+```{r}
+fig_lexdec_rt + fig_lexdec_l1
+```
+
+### Kombinieren von Plots mit `/`
+
+```{r}
+fig_lexdec_rt / fig_lexdec_l1
+```
+
+# Entscheidung für ein Geom {.smaller}
+
+- Warum verwenden wir ein Histogramm für die Reaktionszeit und ein Balkendiagramm für die Muttersprache?
+- Um welche Arten von Variablen handelt es sich?
+  + Reaktionszeit ist kontinuierlich
+  + Muttersprache ist eine kategoriale Variable
+- Wir verwenden Histogramme, um die Verteilungen von *kontinuierlichen* Variablen zu visualisieren.
+- Wir verwenden Balkendiagramme, um Verteilungen von *kateogrischen* Variablen zu visualisieren.
+- Wenn wir wissen, was wir visualisieren wollen (z. B. Verteilungen) und welche Art von Variable wir haben (d. h. kontinuierlich, kategorial), können wir entscheiden, welche Art von Diagramm wir erstellen wollen.
+- Oft ist es eine gute Idee, die Darstellung auf Papier zu zeichnen, bevor man in R beginnt (ich mache das auch oft).
+
+# Hausaufgaben
+
+[Anhang 2](https://daniela-palleschi.github.io/r4ling/appendices/00-aufgaben.html#app-data_viz1) auf der Website des Kurses.
+
+# Heutige Ziele {.unnumbered .unlisted}
+
+Heute haben wir gelernt...
+
+- was Datenrahmen sind
+- den Unterschied zwischen kategorialen und kontinuierlichen Daten
+- wie man Diagramme mit `ggplot` erstellt
+- die richtige Darstellung für unsere Daten auszuwählen
+
+# Session Info {.unnumbered}
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.3.0.386 (Cherry Blossom).
+
+```{r}
+sessionInfo()
+```
+
+```{r}
+#| eval: false
+#| echo: false
+quarto::datenviz_render(output_format = "all")
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

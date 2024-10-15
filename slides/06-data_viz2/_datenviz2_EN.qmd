@@ -1,0 +1,690 @@
+---
+title: "Datenvisualiserung 2"
+subtitle: "Visualisierung von Beziehungen"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Woche 2 - Datenvisualisierung 2: Beziehungen" 
+lang: de
+date: "10/25/2023"
+date-format: "ddd [d]en DD.MM.YYYY"
+date-modified: last-modified
+format: 
+  html:
+    output-file: dataviz2_blatt.html
+    include-after-body: ../../custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "heutige Themen"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: dataviz2_folien.html
+    include-after-body: ../../custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: dataviz2.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: ../../references.bib
+csl: ../../apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+
+# rbbt::bbt_update_bib("_dataviz2.qmd")
+```
+
+# Wiederholung {.unnumbered .unlisted}
+
+Last week we learned...
+
+- how to wrangle data using the `dplyr` package from the `tidyverse`
+- learn to use uses the `pipe` (` |> `) to feed the result of one function into another function
+- about functions that operate on rows
+  + `filter()`, `arrange()`
+- about functions that operate on columns
+  + `rename()`, `mutate()`, `select()`, `relocate()`
+- how to combine `dplyr` functions with plots from `ggplot2`
+
+## Wiederholung {.unnumbered .unlisted}
+
+::: {.content-hidden when-format="pdf"}
+:::: {.columns}
+
+::: {.column width="50%"}
+- what do pipes connect? `|>`
+  + `dplyr` verbs/functions
+- what do pluses connect? `+`
+  + `ggplot` layers
+:::
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Look here for a hint"
+data |> 
+  mutate(new_variable = height_cm/age) |> 
+  filter(new_variable > 5) |> 
+  ggplot() +
+  aes(x = age, y = height) +
+  geom_point()
+```
+:::
+
+::::
+:::
+
+::: {.content-visible when-format="pdf"}
+
+- what do pipes connect? `|>`
+  + `dplyr` verbs/functions
+- what do pluses connect? `+`
+  + `ggplot` layers
+
+```{r}
+#| eval: false
+#| code-fold: true
+data |> 
+  mutate(new_variable = height_cm/age) |> 
+  filter(new_variable > 5) |> 
+  ggplot() +
+  aes(x = age, y = height) +
+  geom_point()
+```
+
+:::
+
+# Learning objectives {.unnumbered .unlisted}
+
+Today we will learn...
+
+- how to plot two or more variables
+  + with aesthetics and with facet grids
+- how to use code chunk options
+- how to save plots as files
+
+## Lesungen {.unnumbered}
+
+Die **Pflichtlektüre** zur Vorbereitung auf dieses Thema ist [Kap. 2 (Datenvisualisierung)](https://r4ds.hadley.nz/data-visualize) aus [Abschnitt 2.5](https://r4ds.hadley.nz/data-visualize#visualizing-relationships) in @wickham_r_2023.
+
+Eine **ergänzende Lektüre** ist [Ch. 3 (Data visualtion)](https://psyteachr.github.io/ads-v2/03-viz.html) in @nordmann_applied_2022.
+
+# Set-up {.unnumbered}
+
+## Packages {.unnumbered}
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(ggthemes)
+library(languageR)
+```
+
+```{r}
+#| echo: false
+pacman::p_load(
+  knitr, kableExtra
+)
+```
+
+- `tidyverse` family of packages
+  + `ggplot2` for plots
+  + `dplyr` for data wrangling
+- `ggthemes` for colorblind-friendly color palettes
+- `patchwork` for plot layouts
+- `languageR` for linguistic datasets
+
+## ggplot theme {.unnumbered}
+
+I set my preferred ggplot theme globally. This means that after I run this code, the plots will all use this theme.
+
+```{r}
+theme_set(theme_bw())
+```
+
+
+## Data {.unnumbered}
+
+We will use the `english` dataset from @languageR-package.
+  
+  + contains data from a lexical decision task in English
+  + let's back-transform the log transformed reaction times so they're in milliseconds
+    - we use the `exp()` function to do this
+
+```{r}
+df_english <- 
+  english |> 
+  mutate(RTlexdec = exp(RTlexdec),
+         RTnaming = exp(RTnaming))
+```
+
+### `english` dataset {.unnumbered .smaller}
+
+Our variables of interest are:
+
+```{r}
+#| label: tbl-english
+#| tbl-cap: english dataset variables of interest
+#| echo: false
+tribble(
+  ~variable, ~description, ~type,
+  "RTlexdec", "Reaction times for a visual lexical decision (milliseconds)", "continuous",
+  "RTnaming", "Reaction times for the onset of a verbal word naming task (milliseconds)", "continuous",
+  "WrittenFrequency", "numeric vector with log frequency in the CELEX lexical database.", "continuous",
+  "Word", "a factor with 2284 words", "categorical",
+  "AgeSubject", "a factor with as levels the age group of the subject: young versus old.", "categorical",
+  "WordCategory", "a factor with as levels the word categories N (noun) and V (verb).", "categorical",
+  "CV", "factor specifying whether the initial phoneme of the word is a consonant (C) or a vowel (V).", "categorical",
+  "CorrectLexdec", "numeric vector with the proportion of subjects that accepted the item as a word in lexical decision.", "continous"
+) |> 
+  kable() |> 
+  kable_styling()
+```
+
+## Hypotheses {.unnumbered}
+
+- what types of hypotheses might you have for such data?
+  + our reaction time data are our *measure variables*
+    + i.e., what we measure
+  + all the other variables are possible *predictor variables*
+    + i.e., we might predict that their value would influence our measure variables
+  
+- for example, what effect (if any) might word frequency have on lexical decision task reaction times? on naming times?
+  + what about differences in reaction times between younger and older participants?
+- what effect (if any) might word category have on reaction times?
+
+# Data visualisation
+
+- visualising our data helps us visualise the relationship between variables in order to tell a story
+- we typically visualise variables that we have a particular hypothesis for: predictor and measure variable(s)
+
+## Visualising distributions
+
+- histograms, density plots, and bar plots for count values all visualise the *distribution* of observations
+  + they tell us about how many times we observed certain values of a variable
+  + we usually do this to get a feel for what our data look like
+    + what is the range of our data, the mode, the overall distribution of values?
+
+
+::: callout-tip
+## Task: visualising relationships
+
+1. Create a plot that visualises the distribution of word written frequency.
+2. Create a plot that visualises the distribution of nouns and verbs.
+
+
+```{r}
+#| echo: false
+#| eval: false
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency) +
+  geom_histogram() +
+
+df_english |> 
+  ggplot() +
+  aes(x = WordCategory) +
+  geom_bar() +
+  
+plot_annotation(tag_levels = "A")
+```
+
+:::
+
+# Visualising relationships
+
+- to visualise relationships between variables, we need to have at least two variables mapped to a plot's aesthetics
+- we've already done this by mapping colour or fill to a categorical variable, while mapping:     + a continuous variable to the x-axis for histograms/density plots, or
+    + a categorical variable to the y-axis for a barplot
+    
+::: callout-tip
+## Task: visualising relationships in distributions
+
+1. Add another aesthetic to the plots you just created in order to show:
+    + the distribution of WrittenFrequency scores for words with initial consonants and vowels
+    + the distribution of nouns and verbs for words with initial consonants and vowels
+
+
+```{r}
+#| echo: false
+#| eval: false
+#| label: fig-distributions
+#| fig-cap: Visualising relationships in distributions
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, fill = CV) +
+  geom_histogram() +
+  scale_fill_colorblind() +
+
+df_english |> 
+  ggplot() +
+  aes(x = WordCategory, fill = CV) +
+  geom_bar() +
+  scale_fill_colorblind() +
+  
+plot_annotation(tag_levels = "A")
+```
+
+:::
+
+## Grouped continuous variable
+
+- our histograms, density plots, and bar plots all shows the distribution of values of a *continuous* variable by different levels of a *categorical* variable
+
+### Stacked
+
+- recall that by default these categories are "stacked" on top of each other
+
+```{r}
+#| echo: false
+#| label: fig-stacked
+#| fig-cap: Visualising relationships in distributions
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, fill = CV) +
+  geom_histogram() +
+  scale_fill_colorblind() +
+
+
+df_english |> 
+  ggplot() +
+  aes(x = WordCategory, fill = CV) +
+  geom_bar() +
+  scale_fill_colorblind() +
+
+  
+plot_annotation(tag_levels = "A")
+```
+
+### Dodged
+
+- but that we can have them side-by-side by using the 'dodge' function
+  + I find this is more useful for bar plots
+
+```{r}
+#| echo: false
+#| label: fig-task1
+#| fig-cap: Visualising relationships in distributions
+#| fig-asp: .8
+(df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, fill = CV) +
+  geom_histogram(position = "identity") +
+  scale_fill_colorblind() +
+
+  
+  df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, fill = CV) +
+  scale_fill_colorblind() +
+  geom_histogram(position = "dodge")) /
+
+  (
+    df_english |> 
+  ggplot() +
+  aes(x = WordCategory, fill = CV) +
+  geom_bar() +
+  scale_fill_colorblind() +
+
+  
+df_english |> 
+  ggplot() +
+  aes(x = WordCategory, fill = CV) +
+  scale_fill_colorblind() +
+  geom_bar(position = "dodge") 
+) +
+  
+plot_annotation(tag_levels = "A")+
+  plot_layout(guides = "collect")
+```
+
+## Two continuous variables
+
+- we often want to see the effect one continuous variable has on another
+- for example, in our `english` dataset we have the variables `WrittenFrequency` and `RTlexdec`
+  + what type of relationship do you think these two variables will have?
+  + i.e., do you think that words with lower WrittenFrequency will tend of have longer or shorter reaction times in a lexical decision task?
+  + how might we visualise such a relationship?
+  
+## {.unnumbered .unlisted}
+
+```{r}
+# + geom_?
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec) 
+```
+
+## {.unnumbered .unlisted}
+
+```{r}
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec) +
+  geom_point()
+```
+
+::: {.content-visible when-format="revealjs"}
+## {.unnumbered .unlisted}
+
+```{r}
+#| echo: false
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec) +
+  geom_point()
+```
+:::
+
+- take a moment to look at this plot and come up with an interpretation
+  + what effect does written frequency of a word have on reaction times in a lexical decision task?
+  + Complete the sentence: "Words with a higher word frequency elicited ___________ reaction times"
+
+- where was there more variation in the reaction times? Where was there less variation?
+
+## Adding more variables
+
+- recall that we can use other aesthetics like `fill` or `colour`
+  + for `geom_point()`, it's also helpful to use `shape`
+  
+```{r}
+#| output-location: column-fragment
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  geom_point()
+```
+
+- there's a lot of overlap in the middle of the plot
+  + how can we change the opacity of the points?
+
+::: {.content-visible when-format="revealjs"}
+## {.unlisted .unnumbered}
+:::
+
+```{r}
+#| output-location: column-fragment
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  geom_point(alpha = .5)
+```
+
+- describe the relationship between age group and reaction times
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-add]: `Adding another variable`
+::: {#exm-add .custom}
+::: nonincremental
+How might you include a fourth variable in the plot above? Try adding `CV`. Does the plot still tell a clear story?
+:::
+:::
+:::
+
+
+## Facet grids
+
+- in general, if you want to plot more than three variables it's a good idea to split categorical variables into *facets*
+  + facets are subplots that displays subsets of the data
+- we can use `facet_wrap()`, which takes a formula as its argument
+  + this formula includes `~` and the name of a cateogircal variable, e.g., `~CV`
+  
+## {.unnumbered .uncounted}
+
+```{r}
+#| code-line-numbers: "7"
+# + geom_?
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  facet_wrap(~CV) 
+```
+
+## {.unnumbered .uncounted}
+
+```{r}
+#| code-line-numbers: "6-7"
+df_english |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  facet_wrap(~CV) +
+  geom_point(alpha = .5)
+```
+
+# Wrangled data
+
+- We can also wrangle our data before feeding it into `ggplot()`
+  - This is useful when we don't want to make permanent changes to the data, but we just want to plot for example a subset of the data
+
+- maybe we only want to look at words that begin with a vowel, how might we do this with a `dplyr` verb?
+
+## {.unnumbered .unlisted}
+
+```{r}
+#| output-location: column-fragment
+df_english |> 
+  filter(CV == "V") |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  geom_point()
+```
+
+::: callout-tip
+
+# Plot annotation
+
+The point of data visualisation is to communicate something about your data. In order to do this, we need to faciliate the reader's understanding of what our model is showing. Right now, our plots don't have a title, and the axis labels correspond to the variable names in our data, which may not be interpretable to an outsider.
+
+All this to say, remember to give useful labels to your plots. Let's add a title, and x- and y-axis labels. There are several different ways to do this, but I find the cleanest way is to use the `labs()` ggplot-layer, which takes as its arguments `title = ""`, `x = ""`, and `y = ""`. If you also have other aesthetics (e.g., `fill` or `shape`), you can add labels to those to make sure your legend also has a reader-friendly title.
+
+```{r}
+df_english |> 
+  filter(CV == "V") |> 
+  ggplot() +
+  aes(x = WrittenFrequency, y = RTlexdec,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  labs(title = "WrittenFrequency scores by reaction time",
+       x = "WrittenFrequency score",
+       y = "Reaction time (ms)",
+       colour = "Age group",
+       shape = "Age group") +
+  geom_point()
+```
+
+:::
+
+# Quarto code chunk settings
+
+- long code chunks can lead to very messy output documents
+- usually only the plot is important to the reader, not the code that produced it
+- we can control the presentation and evaluation of code chunks through code chunk options
+  + these begin with `#|`
+  + and are placed directly below ```` ```{r}``` ````
+
+- important code chunk options:
+
+```{r}
+#| label: tbl-chunks
+#| tbl-cap: Most common chunk options
+#| echo: false
+tribble(
+  ~"option", ~"values", ~"function",
+  "#| echo: ", "true/false", "should this code chunk be printed when rendering?",
+  "#| eval: ", "true/false", "should this code chunk be run when rendering?"
+) |> 
+  kable() |> kable_styling()
+```
+
+## Using code chunks
+
+- why do we not see the result of this plot?
+
+```{r}
+#| echo: fenced
+#| eval: false
+df_english |> 
+  ggplot() +
+  aes(x = RTlexdec, y = RTnaming,
+      colour = AgeSubject,
+      shape = AgeSubject) +
+  geom_point()
+```
+
+# Saving plots
+
+- we often want to use our plots in a document that is not created in RStudio
+  + for example in a thesis or a paper written in LaTeX
+- to do this we need to load in our figures as an accepted file type, such as `jpeg` or `png`
+- we can do this with the `ggsave()` function
+
+- Can you guess what types of arguments `ggsave()` needs in order to save our plots? Some are required, some are optional.
+
+## `ggsave()`
+
+At minimum `ggsave()` takes as its arguments:
+
+1. the name of the plot in your Environment that you wish to save
+2. the file name you wish to save your plot under
+    + it's a good idea to create a folder where you will save your plots, and to include the filepath in the name
+
+### `ggsave()` optional argumets
+
+- some optional arguments are:
+  - `width = `: how wide you want your plot to be in cm, mm, inches, or pixels
+  - `height = `:
+  - `dpi = `: desired resolution (numerical, or a set of strings: "retina" = 320, "print" = 300, or "screen" = 72)
+  - `bg =`: background colour, e.g., "black"
+  
+::: {.content-visible when-format="revealjs"}
+## `eval: false` {.unlisted .unnumbered}
+:::
+
+::: callout-warning
+*Always* set code chunks that save files to your machine to `eval: false`!!! Otherwise, every time that you run your script, the file will be re-written locally.
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Aufgabe {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Aufgabe @exm-ggsave]: `ggsave()`
+::: {#exm-ggsave .custom}
+::: nonincremental
+1. Copy the code below into a code chunk and run it. Look at your 'Files' tab, what has changed?
+
+```{r}
+#| echo: fenced
+#| eval: false
+ggsave(
+  # required:
+  "figures/04-dataviz2/fig_lexdec_rt.png", 
+  plot = fig_lexdec_rt,
+  # optional:
+  width = 2000,
+  height = 1000,
+  units = "px",
+  scale = 1,
+  dpi = "print")
+```
+
+2. Try playing with the scale and dpi. What changes?
+3. Try changing the units, width, and height values. What changes?
+:::
+:::
+:::
+
+
+# Exercises
+
+1.
+    a. Plot dodged barplots of AgeSubject (x-axis) by CV (facets).
+    b. Change your code chunk options for the last plot so that the code, but not the plot, is printed in the output.
+3. 
+    a. Filter the data to include only older participants, and plot RTlexdec (x-axis) by RTnaming (y-axis). Map CV onto colour and shape. Add appropriate plot labels.
+    b. Change your code chunk options for the last plot so that the plot, but not the code, is printed in the output.
+4. Save the last plot locally, and set the code chunk to *not* run during rendering.
+
+
+
+# Session Info {.unnumbered .unlisted}
+
+Hergestellt mit `r R.version.string` (`r R.version$nickname`) und RStudioversion 2023.9.0.463 (Desert Sunflower).
+
+```{r}
+sessionInfo()
+```
+
+```{r}
+#| eval: false
+#| echo: false
+quarto::datenviz_render(output_format = "all")
+```
+
+# Literaturverzeichnis {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
